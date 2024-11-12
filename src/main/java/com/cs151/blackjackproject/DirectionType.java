@@ -33,9 +33,9 @@ public enum DirectionType {
             case DOWN: 
                 return new int[]{0, 1}; // Moves down by increasing y-axis
             case RIGHT:
-                return new int[]{-1, 0}; // Moves right by decreasing x-axis
+                return new int[]{1, 0}; // Moves right by increasing x-axis
             case LEFT:
-                return new int[]{1, 0}; // Moves left by increasing x-axis
+                return new int[]{-1, 0}; // Moves left by decreasing x-axis
             default:
                 return new int[]{0, 0}; // No movement
         }
