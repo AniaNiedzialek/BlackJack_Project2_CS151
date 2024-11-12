@@ -6,6 +6,6 @@ package com.cs151.blackjackproject;
  * class integrates all game components and oversees the gameplay experience, updating
  * the state continuously and responding to events like food consumption and collisions.
  */
-public class SnakeGame {
+public class SnakeGameController {
 
 }
