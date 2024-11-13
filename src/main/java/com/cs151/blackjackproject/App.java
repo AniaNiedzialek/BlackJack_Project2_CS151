@@ -14,3 +14,6 @@ public class App {
         LOGGER.info("Hello, BlackJack Project!");
     }
 }
+
+// comment for testing the json files
+// SECOND LINE FOR TESTING
