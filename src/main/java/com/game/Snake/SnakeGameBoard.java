@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game.Snake;
 
 /*
  * SnakeGameBoard is specificly made for snake game.

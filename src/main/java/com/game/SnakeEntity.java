@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 import javafx.geometry.Point2D;
 

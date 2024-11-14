@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 import javafx.scene.layout.HBox;
 import javafx.geometry.Insets;

@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Represents a food item in the Snake game, which the snake consumes to grow and score

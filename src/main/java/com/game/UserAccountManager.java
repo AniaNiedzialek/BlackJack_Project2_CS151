@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Manages user accounts for the game application, handling account creation, login,

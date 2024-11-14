@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * GameControler interface contains core game functionalities that

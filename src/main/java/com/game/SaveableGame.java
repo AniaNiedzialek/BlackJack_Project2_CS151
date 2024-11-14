@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * SaveAble game interface contains methods foer games that need

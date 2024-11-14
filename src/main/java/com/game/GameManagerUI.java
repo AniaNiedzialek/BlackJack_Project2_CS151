@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Manages the main functionality of the game application, including user login,

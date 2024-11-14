@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Enum representing the possible movement directions for the snake in the Snake game.

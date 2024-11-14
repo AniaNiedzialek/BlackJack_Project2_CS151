@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Controls the main logic and flow of the Snake game, managing the game loop, handling

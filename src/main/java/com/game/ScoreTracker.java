@@ -1,4 +1,4 @@
-package com.cs151.blackjackproject;
+package com.game;
 
 /*
  * Manages the score for games, allowing scores to be incremented, retrieved, and displayed.
