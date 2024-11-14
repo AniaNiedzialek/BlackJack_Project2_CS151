@@ -28,20 +28,26 @@ public class GameManagerUI extends Application {
     public void start(Stage primaryStage) {
 
         // Create title
-        Label titleLabel = new Label("Welcome");
+        Label titleLabel = new Label("Welcome to Sunny Games");
         titleLabel.setStyle("-fx-font-size: 40px;");
 
         // Create login button
         Button loginButton = new Button("Login");
         loginButton.setFont(new Font("Georgia", 20));
-        loginButton.setPrefSize(100, 50);
+        loginButton.setPrefSize(100, 30);
         loginButton.setOnAction(e -> showLoginForm(primaryStage)); // Show login form
 
         // Create "create account" button
         Button accountButton = new Button("Create Account");
         accountButton.setFont(new Font("Georgia", 20));
-        accountButton.setPrefSize(200, 50);
-        accountButton.setOnAction(e -> showAccountForm(primaryStage));  
+        accountButton.setPrefSize(200, 30);
+        accountButton.setOnAction(e -> showAccountForm(primaryStage));
+
+        // Create View Leaderboard button
+        Button leaderboardButton = new Button("View Leaderboard");
+        leaderboardButton.setFont(new Font("Georgia", 20));
+        leaderboardButton.setPrefHeight(30);
+        
 
         // Add toolbar from toolbarUI
         ToolBarUI toolbar = new ToolBarUI();
@@ -63,12 +69,12 @@ public class GameManagerUI extends Application {
         hbox.setStyle("-fx-background-color: #ECECEC; -fx-border-color: #DEDEDE; -fx-border-width: 2px; -fx-border-radius: 5;");
 
         // Add buttons to hbox
-        hbox.getChildren().addAll(titleLabel, loginButton, accountButton);
+        hbox.getChildren().addAll(titleLabel, loginButton, accountButton, leaderboardButton);
 
         vbox.getChildren().setAll(toolbarContainer, titleLabel, hbox);
 
         // Set primary scene with hbox
-        mainMenuScene = new Scene(vbox, 400, 200);
+        mainMenuScene = new Scene(vbox, 540, 200);
 
         // Set the stage
         primaryStage.setTitle("Game Manager");
@@ -79,8 +85,19 @@ public class GameManagerUI extends Application {
 
     private void showLoginForm(Stage stage) {
         VBox vboxLogin = new VBox(10);
-        vboxLogin.setPadding(new Insets(15));
+        vboxLogin.setPadding(new Insets(2));
         vboxLogin.setAlignment(Pos.CENTER);
+
+        // Add toolbar from toolbarUI
+        ToolBarUI toolbar = new ToolBarUI();
+
+        // Create stack pane for toolbar
+        StackPane toolbarContainer = new StackPane();
+        toolbarContainer.setStyle("-fx-background-color: #ECECEC; -fx-border-color: #DEDEDE; -fx-border-width: 2px; -fx-border-radius: 5;");
+        toolbarContainer.getChildren().addAll(toolbar);
+
+        // Getter for menuButton
+        toolbar.getMenuButton().setOnAction(e -> stage.setScene(mainMenuScene));
 
         // Username Label
         Label usernameLabel = new Label("Enter Username:");
@@ -106,10 +123,10 @@ public class GameManagerUI extends Application {
         backButton.setOnAction(e -> stage.setScene(mainMenuScene));  // Go back to the main screen
 
         // Add all elements to vbox
-        vboxLogin.getChildren().addAll(usernameLabel, usernameTextField, passwordLabel, passwordTextField, submitButton, backButton);
+        vboxLogin.getChildren().addAll(toolbarContainer, usernameLabel, usernameTextField, passwordLabel, passwordTextField, submitButton, backButton);
 
         // Create scene with vboxLogin as the root
-        Scene loginScene = new Scene(vboxLogin, 400, 300);
+        Scene loginScene = new Scene(vboxLogin, 400, 255);
 
         // Set stage with the login scene
         stage.setScene(loginScene);
