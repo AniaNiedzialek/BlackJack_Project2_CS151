@@ -1,4 +1,4 @@
-package com.game;
+package com.game.Snake;
 
 import javafx.geometry.Point2D;
 
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import com.game.DirectionType;
 
 /*
  * Represents the snake in the Snake game, managing its segments, movement, and growth.

@@ -1,4 +1,4 @@
-package com.game;
+package com.game.Snake;
 
 /*
  * Represents a food item in the Snake game, which the snake consumes to grow and score
