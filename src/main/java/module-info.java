@@ -4,3 +4,9 @@ module com.game {
 
     exports com.game;
 }
+
+// module com.game {
+   // requires javafx.controls;
+   // requires javafx.graphics;
+   // exports com.game.Snake to javafx.graphics;
+// }

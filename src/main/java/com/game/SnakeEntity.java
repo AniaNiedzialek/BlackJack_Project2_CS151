@@ -1,11 +1,11 @@
 package com.game;
 
-import javafx.geometry.Point2D;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javafx.geometry.Point2D;
 
 /*
  * Represents the snake in the Snake game, managing its segments, movement, and growth.
@@ -119,8 +119,9 @@ public class SnakeEntity {
      * @param newDirection  The new directio to set.
      */
     public void setSnakeDirection(DirectionType newDirection) {
-        if (!(direction.isOpposite(newDirection))) {
+        if (!direction.isOpposite(newDirection)) {
             this.direction = newDirection;
+            System.out.println("Direction changed to: " + this.direction); // Debugging line
         }
     }
 
