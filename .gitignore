@@ -29,6 +29,3 @@ replay_pid*
 # Ignore VS Code settings files
 .vscode/settings.json
 .vscode/launch.json
-
-# Ignore pom.xml
-pom.xml
