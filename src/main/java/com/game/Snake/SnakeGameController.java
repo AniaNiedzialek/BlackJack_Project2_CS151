@@ -1,4 +1,4 @@
-package com.game;
+package com.game.Snake;
 
 /*
  * Controls the main logic and flow of the Snake game, managing the game loop, handling
