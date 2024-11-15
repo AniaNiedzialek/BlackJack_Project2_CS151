@@ -1,14 +1,11 @@
 package com.game.Snake;
 
 /*
- * Required Imports
+Required Imports
  */
-
 import java.util.List;
 
 import com.game.DirectionType;
-import com.game.SnakeEntity;
-import com.game.SnakeFoodItem;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;

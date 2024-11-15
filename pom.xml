@@ -49,8 +49,8 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <!--<mainClass>com.game.GameManagerUI</mainClass -->
                             <mainClass>com.game.GameManagerUI</mainClass>
+                            <!--mainClass>com.game.SnakeBoardTest</mainClass-->
                         </configuration>
                     </execution>
                 </executions>
