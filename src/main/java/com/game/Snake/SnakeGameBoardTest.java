@@ -4,49 +4,63 @@ import com.game.DirectionType;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class SnakeGameBoardTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Create the SnakeGameBoard for testing
-        SnakeGameBoard gameBoard = new SnakeGameBoard(400, 400);
+        SnakeGameBoard gameBoard = new SnakeGameBoard(600, 400);
 
-        // Set up buttons
-        Button startButton = new Button("Start");
-        startButton.setOnAction(e -> gameBoard.startGame());
+        Scene scene = new Scene(gameBoard);
 
-        // Add components to layout
-        BorderPane root = new BorderPane();
-        root.setCenter(gameBoard);
-
-        BorderPane buttonPane = new BorderPane();
-        buttonPane.setLeft(startButton);
-        root.setBottom(buttonPane);
-
-        // Set up the scene
-        Scene scene = new Scene(root, 400, 450);
-
-        // Add key event listener to handle direction changes
-        scene.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case UP -> gameBoard.updateDirection(DirectionType.UP);
-                case DOWN -> gameBoard.updateDirection(DirectionType.DOWN);
-                case LEFT -> gameBoard.updateDirection(DirectionType.LEFT);
-                case RIGHT -> gameBoard.updateDirection(DirectionType.RIGHT);
+        // Set up keyboard listeners for the scene
+        scene.setOnKeyPressed(event -> {
+            System.out.println("Key pressed: " + event.getCode()); // Debug logging
+            
+            switch (event.getCode()) {
+                case R:
+                    System.out.println("Resetting game...");
+                    gameBoard.getSnakeController().resetGame();
+                    gameBoard.getSnakeUI().drawSnake();
+                    break;
+                case SPACE:
+                    System.out.println("Space pressed - Starting game...");
+                    gameBoard.getSnakeController().startGame();
+                    System.out.println("Game running status: " + gameBoard.getSnakeController().isRunning()); // Debug logging
+                    break;
+                case UP:
+                    System.out.println("Up pressed");
+                    gameBoard.getSnakeController().updateSnakeDirection(DirectionType.UP);
+                    break;
+                case DOWN:
+                    System.out.println("Down pressed");
+                    gameBoard.getSnakeController().updateSnakeDirection(DirectionType.DOWN);
+                    break;
+                case LEFT:
+                    System.out.println("Left pressed");
+                    gameBoard.getSnakeController().updateSnakeDirection(DirectionType.LEFT);
+                    break;
+                case RIGHT:
+                    System.out.println("Right pressed");
+                    gameBoard.getSnakeController().updateSnakeDirection(DirectionType.RIGHT);
+                    break;
+                default:
+                    System.out.println("Unhandled key: " + event.getCode());
+                    break;
             }
         });
-
-        // Set up the stage
-        primaryStage.setTitle("Snake Game Board Test");
+        
+        primaryStage.setTitle("SnakeGameBoard Test");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        // Initial game setup
+        System.out.println("Initial game setup complete");
+        System.out.println("Press SPACE to start the game!");
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-}
+} 
