@@ -29,3 +29,7 @@ replay_pid*
 # Ignore VS Code settings files
 .vscode/settings.json
 .vscode/launch.json
+
+# Additional files to ignore
+createdFiles.lst
+inputFiles.lst
