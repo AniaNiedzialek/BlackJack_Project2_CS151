@@ -15,7 +15,6 @@ public class SnakeFoodItem {
     private Random random = new Random();
     private int gridWidth;
     private int gridHeight;
-    SnakeEntity snake = new SnakeEntity();
 
     // Constructor accepting grid dimensions
     public SnakeFoodItem(int gridWidth, int gridHeight) {
@@ -26,12 +25,15 @@ public class SnakeFoodItem {
     public void spawnFood(List<Point2D> snakeSegments) {
         Point2D newPosition;
         do {
-            int x = random.nextInt(gridWidth);
-            int y = random.nextInt(gridHeight);
+            int x = random.nextInt(gridWidth - 1); // Avoid placing food on the border
+            int y = random.nextInt(gridHeight - 1); // Same here
+    
             newPosition = new Point2D(x, y);
         } while (snakeSegments.contains(newPosition)); // Regenerate if position is on the snake
-        position = newPosition; // Set the position once a valid is found
+    
+        position = newPosition; // Set the position once it's valid
     }
+    
 
     // Getter for position
     public Point2D getPosition() {

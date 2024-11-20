@@ -16,6 +16,11 @@ public class SnakeGameController {
     private Canvas canvas;
     private final int gridWidth;
     private final int gridHeight;
+    private boolean isGameOver = false;
+
+    // Constants for smooth movement
+    private static final long MOVE_INTERVAL = 150_000_000; // Time between actual moves (150ms)
+    private static final long FRAME_INTERVAL = 16_666_667; // ~60 FPS (16.67ms)
 
     public SnakeGameController(SnakeGameBoard gameBoard, Canvas canvas, int gridWidth, int gridHeight, SnakeEntity snake, SnakeFoodItem foodItem) {
         this.gameBoard = gameBoard;
@@ -29,22 +34,28 @@ public class SnakeGameController {
     }
 
     public void startGame() {
-        // Reset the game state before starting
-        snake.reset();
-        foodItem.spawnFood(snake.getSegmenets());
-        
+        isGameOver = false; // Reset game over state
         if (gameLoop == null) {
+            final long[] lastMoveTime = {0};
+            final long[] lastRenderTime = {0};
             gameLoop = new AnimationTimer() {
-                private long lastUpdate = 0;
-                private static final long FRAME_INTERVAL = 150_000_000; // Slightly slower for better control
-                
                 @Override
                 public void handle(long now) {
-                    if (now - lastUpdate >= FRAME_INTERVAL) {
-                        moveSnake();
-                        lastUpdate = now;
+                    // Handle movement updates
+                    if (!isGameOver) {
+                        if (now - lastMoveTime[0] >= MOVE_INTERVAL) {
+                            moveSnake();
+                            lastMoveTime[0] = now;
+                        }
+    
+                        // Handle rendering at 60 FPS
+                        if (now - lastRenderTime[0] >= FRAME_INTERVAL) {
+                            snakeUI.drawSnake();
+                            lastRenderTime[0] = now;
+                        }
                     }
-                }
+                 }
+                    
             };
             System.out.println("Game loop created.");
         }
@@ -53,34 +64,17 @@ public class SnakeGameController {
             isRunning = true;
             gameLoop.start();
             System.out.println("Game loop started.");
-            // Initial draw
             snakeUI.drawSnake();
-        } else {
-            System.out.println("Game loop is already running.");
-        }
-        
-        if (!isRunning) {
-            isRunning = true;
-            gameLoop.start();
-            System.out.println("Game loop started.");
-        } else {
-            System.out.println("Game loop is already running.");
         }
     }
 
     public void stopGame() {
-        if (!isRunning) {
-            System.out.println("Game is already stopped.");
-            return;
-        }
-
         if (gameLoop != null) {
-            System.out.println("Stopping game loop...");
+            System.out.println("Game is already stopped.");
             gameLoop.stop();
             gameLoop = null;
-            System.out.println("Game loop stopped.");
+            System.out.println("Game Loop Stopped");
         }
-
         isRunning = false;
     }    
 
@@ -96,36 +90,33 @@ public class SnakeGameController {
     }
 
     public void moveSnake() {
-        if (!isRunning) {
+        if (!isRunning || isGameOver) {
             System.out.println("Game is not running. Exiting moveSnake.");
             return;
         }
     
-        snake.move();
-    
-        // Check for collisions
-        if (snake.hasSelfCollision() || snake.hasHitBoundary((int)(canvas.getWidth() / 15), (int)(canvas.getHeight() / 15))) {
-            System.out.println("Game Over!");
-            stopGame();
-            snakeUI.drawGameOver();
+        // Check for collisions BEFORE moving
+        if (snake.hasSelfCollision() || snake.hasHitBoundary()) {
+            handleGameOver();
             return;
         }
+
+        // Only move if no collision
+        snake.move();
     
+        // Checks for food collision
         if (snake.getHeadPosition().equals(foodItem.getPosition())) {
             snake.grow();
             foodItem.spawnFood(snake.getSegmenets());
         }
-    
-        snakeUI.drawSnake();
-        requestFocus();
     }
-        
-    public void requestFocus() {
-        if (gameBoard != null) {
-            gameBoard.requestFocus();
-        } else if (canvas != null) {
-            canvas.requestFocus();
-        }
+
+    public void handleGameOver() {
+        isGameOver = true;
+        isRunning = false;
+        stopGame();
+        snakeUI.drawGameOver();
+        System.out.println("Game Over");
     }
 
     public boolean isRunning() {

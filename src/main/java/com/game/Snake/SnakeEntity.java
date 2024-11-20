@@ -10,19 +10,27 @@ import com.game.DirectionType;
 import javafx.geometry.Point2D;
 
 public class SnakeEntity {
+    private static final double CELL_SIZE = 15; // Matched with SnakeUI.CELL_SIZE
     private List<Point2D> segments;
     private DirectionType direction;
     private DirectionType lastDirection; // Add this to track the last direction
     private int growthPending;
     private Random random = new Random();
+    private SnakeGameBoard gameBoard;
+    private SnakeUI snakeUI;
     
-    public SnakeEntity() {
+    public SnakeEntity(SnakeGameBoard gameBoard) {
         this.segments = new LinkedList<>();
-        this.direction = DirectionType.RIGHT; // Always start moving right
+        this.direction = getRandomDirection(); // Always start moving right
         this.lastDirection = direction;
         this.growthPending = 0;
-        initializeSnake(); 
+        this.gameBoard = gameBoard;
     }
+
+        // Setter for SnakeUI
+        public void setSnakeUI(SnakeUI snakeUI) {
+            this.snakeUI = snakeUI;
+        }
 
     public void initializeSnake() {
         // Initialize snake with 3 segments, starting from center moving right
@@ -41,6 +49,7 @@ public class SnakeEntity {
 
     public void move() {
         int[] offset = direction.getMovementOffset();
+        // Create a new head position based on current head and direction
         Point2D newHead = segments.get(0).add(offset[0], offset[1]);
         segments.add(0, newHead);
         lastDirection = direction; // Update last direction after successful move
@@ -61,17 +70,30 @@ public class SnakeEntity {
         // Start checking from the fourth segment to allow for tighter turns
         for (int i = 4; i < segments.size(); i++) {
             if (segments.get(i).equals(head)) {
+                snakeUI.drawGameOver();
                 return true;
             }
         }
         return false;
     }
 
-    public boolean hasHitBoundary(int gridWidth, int gridHeight) {
+    // Check if the snake head hit the boundaries of the game board
+    public boolean hasHitBoundary() {
         Point2D head = segments.get(0);
+        // Covert grid coordinates to actual pixels coordinates
         double x = head.getX();
         double y = head.getY();
-        return x < 0 || x >= gridWidth || y < 0 || y >= gridHeight;
+
+        // Get actual boundaries from the canvas
+        double maxWidth = (gameBoard.getCanvas().getWidth() / CELL_SIZE);
+        double maxHeight = (gameBoard.getCanvas().getHeight() / CELL_SIZE);
+
+        // Check if the head of the snake git the boundaries
+        if (x < 0 || x >= maxWidth || y < 0 || y >= maxHeight) {
+            snakeUI.drawGameOver();
+            return true;
+        }
+        return false;
     }
 
     public void setSnakeDirection(DirectionType newDirection) {
@@ -82,6 +104,10 @@ public class SnakeEntity {
         } else {
             System.out.println("Invalid direction change prevented: " + newDirection);
         }
+    }
+
+    public DirectionType getSnakeDirection() {
+        return this.direction;
     }
 
     public void reset() {
