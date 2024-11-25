@@ -29,7 +29,6 @@ public class SnakeEntity {
         this.gameBoard = gameBoard;
         this.gridColumns = gridColumns;
         this.gridRows = gridRows;
-
     }
 
         // Setter for SnakeUI
@@ -37,19 +36,28 @@ public class SnakeEntity {
             this.snakeUI = snakeUI;
         }
 
-    // Method to initialize the snake
+    // Initialize snake with random direction
     public void initializeSnake() {
-        // Calculate the center position
-        int maxWidth = (int) (gameBoard.getCanvas().getWidth() / CELL_SIZE);
-        int maxHeight = (int) (gameBoard.getCanvas().getHeight() / CELL_SIZE);
-        
+        // Clear existing segments
+        segments.clear();
+
         // Use grid dimensions
         int centerX = gridColumns / 2; 
         int centerY = gridRows / 2;
-        
-        segments.clear();
+
+        // Start with a random direction
+        direction = getRandomDirection();
+        lastDirection = direction; // Keep lastDirection consistent
+
+        // Initialize the snake's body based on the random direction
         for (int i = 0; i < 3; i++) {
-            segments.add(new Point2D(centerX - i, centerY)); // Horizontal starting position
+            Point2D segment = switch (direction) {
+                case UP -> new Point2D(centerX, centerY + i); // Extend downward
+                case DOWN -> new Point2D(centerX, centerY - i); // Extend upward
+                case LEFT -> new Point2D(centerX + i, centerY); // Extend rightward
+                case RIGHT -> new Point2D(centerX - i, centerY); // Extend leftward
+            };
+            segments.add(segment);
         }
     }
         
@@ -97,6 +105,7 @@ public class SnakeEntity {
     // This ensures the snake dies exactly when it touches the border
     public boolean hasHitBoundary() {
         Point2D head = segments.get(0);
+
         // Covert grid coordinates to actual pixels coordinates
         double x = head.getX();
         double y = head.getY();

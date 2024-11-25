@@ -24,9 +24,12 @@ public class SnakeFoodItem {
 
     public void spawnFood(List<Point2D> snakeSegments) {
         Point2D newPosition;
+        int margin = 1; // Margin to avoid the edges of the grid
         do {
-            int x = random.nextInt(gridColumns); // Avoid placing food on the border
-            int y = random.nextInt(gridRows); // Same here
+            // Generates: 0, 1, 2, 3, 4, 5, 6, 7
+            // Then shifts the range to 1, 2, 3, 4, 5, 6, 7, 8
+            int x = random.nextInt(gridColumns - 2 * margin) + margin; // Avoid placing food on the border
+            int y = random.nextInt(gridRows - 2 * margin) + margin; // Same here
     
             newPosition = new Point2D(x, y);
         } while (snakeSegments.contains(newPosition)); // Regenerate if position is on the snake

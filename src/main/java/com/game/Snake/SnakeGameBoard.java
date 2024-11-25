@@ -29,12 +29,15 @@ public class SnakeGameBoard extends StackPane {
      */
     public SnakeGameBoard(double width, double height) {
         
-        // Canvas dimenstions are divisble by the cell size
+        // Calculate dimensions to use full screen area
         double adjustedWidth = Math.floor(width / CELL_SIZE) * CELL_SIZE;
         double adjustedHeight = Math.floor(height / CELL_SIZE) * CELL_SIZE;
 
         canvas = new Canvas(adjustedWidth, adjustedHeight);
         gc = canvas.getGraphicsContext2D();
+
+        // Center the canvas in the StackPane
+        this.setAlignment(javafx.geometry.Pos.CENTER);
         this.getChildren().add(canvas);
     
         // Unified background style for both game and menus
@@ -51,8 +54,9 @@ public class SnakeGameBoard extends StackPane {
 
         // Create UI and controller with proper references
         snakeUI = new SnakeUI(gc, canvas, snake, foodItem, this);
-        snakeController = new SnakeGameController(this, canvas, (int) (width / 15), (int) (height / 15), snake, foodItem);
+        snakeController = new SnakeGameController(this, canvas, gridColumns, gridRows, snake, foodItem);
     
+        // Add listeners to handle window resizing
         this.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         this.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
     }
@@ -62,9 +66,9 @@ public class SnakeGameBoard extends StackPane {
      */
     public void drawBorder() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear the canvas
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(5);
-        gc.strokeRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setStroke(Color.YELLOW);
+        gc.setLineWidth(2);
+        gc.strokeRect(1, 1, canvas.getWidth() - 2, canvas.getHeight() - 2);
     }
 
     /*
@@ -103,6 +107,5 @@ public class SnakeGameBoard extends StackPane {
      */
     public SnakeGameController getSnakeController() {
         return snakeController;
-    }
-    
+    }    
 }
