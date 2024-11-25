@@ -13,20 +13,20 @@ import javafx.geometry.Point2D;
 public class SnakeFoodItem {
     private Point2D position;
     private Random random = new Random();
-    private int gridWidth;
-    private int gridHeight;
+    private int gridColumns;
+    private int gridRows;
 
     // Constructor accepting grid dimensions
-    public SnakeFoodItem(int gridWidth, int gridHeight) {
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
+    public SnakeFoodItem(int gridColumns, int gridRows) {
+        this.gridColumns = gridColumns;
+        this.gridRows = gridRows;
     }
 
     public void spawnFood(List<Point2D> snakeSegments) {
         Point2D newPosition;
         do {
-            int x = random.nextInt(gridWidth - 1); // Avoid placing food on the border
-            int y = random.nextInt(gridHeight - 1); // Same here
+            int x = random.nextInt(gridColumns); // Avoid placing food on the border
+            int y = random.nextInt(gridRows); // Same here
     
             newPosition = new Point2D(x, y);
         } while (snakeSegments.contains(newPosition)); // Regenerate if position is on the snake

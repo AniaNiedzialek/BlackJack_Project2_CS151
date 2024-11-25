@@ -100,7 +100,7 @@ public class SnakeUI {
         // Draw the connected snake body as a path
         gc.beginPath();
         Point2D start = segments.get(0).multiply(CELL_SIZE);
-        gc.moveTo(start.getX() + CELL_SIZE / 2, start.getY() + CELL_SIZE / 2); // Start at the center
+        gc.moveTo(start.getX() + CELL_SIZE / 2, start.getY() + CELL_SIZE / 2); // Center alignment        
     
         for (int i = 1; i < segments.size(); i++) {
             Point2D segment = segments.get(i).multiply(CELL_SIZE);
@@ -111,7 +111,7 @@ public class SnakeUI {
     }
     
     /**
-     * Draws the snake's head with a distinct gradient to match the nebula theme.
+    * Draws the snake's head with a distinct gradient to match the nebula theme.
      * 
      * @param headPos Position of the snake's head.
      */
@@ -134,12 +134,12 @@ public class SnakeUI {
      * 
      * @param foodPos Position of the food.
      */
-private void drawFood(Point2D foodPos) {
-    double x = foodPos.getX() * CELL_SIZE;
-    double y = foodPos.getY() * CELL_SIZE;
+    private void drawFood(Point2D foodPos) {
+        double x = foodPos.getX() * CELL_SIZE;
+        double y = foodPos.getY() * CELL_SIZE;
 
-    // Create a radial gradient for glowing food
-    RadialGradient gradient = new RadialGradient(
+        // Create a radial gradient for glowing food
+        RadialGradient gradient = new RadialGradient(
         0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
         false, CycleMethod.NO_CYCLE,
         new Stop(0, Color.YELLOW),   // Center color
