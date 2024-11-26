@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -65,7 +66,6 @@ public class BlackjackUI extends Application {
         playerArea.setAlignment(Pos.CENTER);
         tableLayout.setBottom(playerArea);
 
-        // Buttons (center)
         Button newGameButton = new Button("New Game");
         Button hitButton = new Button("Hit");
         Button standButton = new Button("Stand");
@@ -97,56 +97,109 @@ public class BlackjackUI extends Application {
     }
 
     private void startNewGame(Button hitButton, Button standButton) {
+        for (Player player : gameController.getPlayers()) {
+            if (player.isHuman()) {
+                // Prompt human player to place a bet
+                TextInputDialog betDialog = new TextInputDialog("100");
+                betDialog.setTitle("Place Your Bet");
+                betDialog.setHeaderText("Your Balance: " + player.getBalance());
+                betDialog.setContentText("Enter your bet amount:");
+    
+                betDialog.showAndWait().ifPresent(bet -> {
+                    int betAmount = Integer.parseInt(bet);
+                    if (betAmount > 0 && betAmount <= player.getBalance()) {
+                        player.setBet(betAmount);
+                        System.out.println(player.toString() + " bet " + betAmount);
+                    } else {
+                        System.out.println("Invalid bet. Setting bet to 100.");
+                        player.setBet(100);
+                    }
+                });
+            } else {
+                // AI players bet a fixed amount
+                player.setBet(100);
+                System.out.println(player.toString() + " bet 100");
+            }
+        }
+    
         gameController.startRound();
         System.out.println("New round started!");
         hitButton.setDisable(false);
         standButton.setDisable(false);
         updateTable();
     }
+    
 
     private void hit() {
         Player currentPlayer = gameController.getCurrentPlayer();
         currentPlayer.addCard(gameController.getDeck().dealCard());
         System.out.println(currentPlayer.toString() + " hits.");
-
+    
         if (currentPlayer.isBusted()) {
             System.out.println(currentPlayer.toString() + " busted!");
             gameController.nextTurn();
         }
-
+    
         updateTable();
     }
+    
+    
+
 
     private void stand() {
         System.out.println(gameController.getCurrentPlayer().toString() + " stands.");
         gameController.nextTurn();
+        if (gameController.isRoundOver()) {
+            gameController.dealerPlay();
+            endRound();
+        }
         updateTable();
     }
+
+    private void endRound() {
+        ArrayList<String> results = gameController.resolveRound();
+        for (String result : results) {
+            System.out.println(result);
+        }
+    
+        // Disable buttons and show balances
+        System.out.println("Round ended.");
+        System.out.println("Player Balances:");
+        for (Player player : gameController.getPlayers()) {
+            System.out.println(player.toString() + ": " + player.getBalance());
+        }
+    }
+    
 
     private void saveGame() {
         String saveState = gameController.saveGameState();
         System.out.println("Game saved! Save State:\n" + saveState);
     }
+    
 
     private void loadGame(Stage primaryStage) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Load Game");
         dialog.setHeaderText("Enter Save State String:");
         dialog.setContentText("Save State:");
-
+    
         dialog.showAndWait().ifPresent(saveState -> {
             gameController.loadGameState(saveState);
             System.out.println("Game loaded from save state!");
-            updateTable();
+            updateTable(); // Update the card display
         });
     }
+    
+    
 
     private void updateTable() {
+        // Clear all boxes
         playerBox.getChildren().clear();
         dealerBox.getChildren().clear();
         aiPlayer1Box.getChildren().clear();
         aiPlayer2Box.getChildren().clear();
 
+        // Update cards for each player
         updateCardDisplay(playerBox, gameController.getCurrentPlayer().getHand());
         updateCardDisplay(dealerBox, gameController.getDealer().getHand());
         updateCardDisplay(aiPlayer1Box, gameController.getPlayers().get(1).getHand());
@@ -162,7 +215,7 @@ public class BlackjackUI extends Application {
                 cardImage.setPreserveRatio(true);
                 cardBox.getChildren().add(cardImage);
             } catch (FileNotFoundException e) {
-                System.out.println("Error loading card image: " + e.getMessage());
+                System.out.println("Error loading card image: " + e.getMessage() + "\n");
             }
         }
     }

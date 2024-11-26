@@ -83,19 +83,16 @@ public class GameController {
         }
     }
 
-    /**
-     * Resolves the round by determining winners and losers and updating balances.
-     * 
-     * @return A list of results as strings to be displayed in the UI.
-     */
+    // Resolves the round by determining winners and losers and updating balances.
+     
     public ArrayList<String> resolveRound() {
         ArrayList<String> results = new ArrayList<>();
         int dealerValue = dealer.calculateHandValue();
         boolean dealerBusted = dealer.isBusted();
-
+    
         for (Player player : players) {
             int playerValue = player.calculateHandValue();
-
+    
             if (player.isBusted()) {
                 results.add(player.toString() + " busted and lost " + player.getBet());
                 player.adjustBalance(-player.getBet());
@@ -109,8 +106,10 @@ public class GameController {
                 player.adjustBalance(-player.getBet());
             }
         }
+    
         return results;
     }
+    
 
     /**
      * Saves the current game state as a string.
