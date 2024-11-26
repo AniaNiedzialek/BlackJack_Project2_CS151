@@ -18,9 +18,6 @@ public class SnakeGameBoard extends StackPane {
     private SnakeGameController snakeController; // Handles game logic
     private GraphicsContext gc;             // Graphics context for drawing
 
-    // Define the background style in a shared location (like a constant or CSS file)
-    String backgroundStyle = "-fx-background-color: linear-gradient(to bottom, #002b00, #004d00);";
-
     /*
      * Constructor to set up the Snake game board.
      * 

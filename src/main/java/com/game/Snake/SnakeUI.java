@@ -25,6 +25,7 @@ public class SnakeUI {
     private final SnakeEntity snake;
     private final SnakeFoodItem foodItem;
     private final SnakeGameBoard gameBoard;
+    private int score = 0;
 
     /**
      * Constructor to initialize the SnakeUI with necessary components.
@@ -44,9 +45,23 @@ public class SnakeUI {
             snake.setSnakeUI(this);
         }
     }
+    
+    /*
+     * Increments score when eating food
+     */
+    public void incrementScore() {
+        score++;
+    }
 
-    /**
-     * Configures the graphics context with consistent styling.
+    /*
+     * Reset score when game is over
+     */
+    public void resetScore() {
+        score = 0;
+    }
+
+    /*
+     * Makes the snake rounded instead of rectangular
      */
     private void configureGraphicsContext() {
         if (gc != null) {
@@ -156,16 +171,24 @@ public class SnakeUI {
     public void drawGameOver() {
         // Clear the canvas first
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gameBoard.drawBorder();
 
         // Draw game over
         gc.setFill(Color.RED);
         gc.setFont(new Font("Arial Bold", 48)); // Font styling
-    
+
         // Draw glowing effect
         gc.setEffect(new javafx.scene.effect.Glow(0.8));
-        gc.fillText("GAME OVER", canvas.getWidth() / 2 - 120, canvas.getHeight() / 2);
+        gc.fillText("GAME OVER", canvas.getWidth() / 2 - 150, canvas.getHeight() / 2 - 50);
     
         // Reset the effect to avoid applying to other drawings
+        gc.setEffect(null);
+            
+        // Draw score
+        gc.setFill(Color.LIMEGREEN);
+        gc.setFont(new Font("Arial", 30));
+        gc.setEffect(new javafx.scene.effect.Glow(0.6));
+        gc.fillText("Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2 - 5);
         gc.setEffect(null);
     }
 }

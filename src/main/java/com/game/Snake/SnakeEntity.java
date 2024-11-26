@@ -20,6 +20,7 @@ public class SnakeEntity {
     private int growthPending;
     private final int gridColumns; // Number of columns in the grid
     private final int gridRows;    // Number of rows in the grid
+    private int score = 0; // Track the score of food
     
     public SnakeEntity(SnakeGameBoard gameBoard, int gridColumns, int gridRows) {
         this.segments = new LinkedList<>();
@@ -85,6 +86,7 @@ public class SnakeEntity {
 
     public void grow() {
         growthPending++; 
+        snakeUI.incrementScore();
     }
 
     public boolean hasSelfCollision() {
@@ -92,7 +94,6 @@ public class SnakeEntity {
         // Start checking from the fourth segment to allow for tighter turns
         for (int i = 4; i < segments.size(); i++) {
             if (segments.get(i).equals(head)) {
-                snakeUI.drawGameOver();
                 return true;
             }
         }
@@ -116,7 +117,6 @@ public class SnakeEntity {
 
         // Check if the head of the snake git the boundaries
         if (x <= 0 || x >= gridColumns - 1 || y <= 0 || y >= gridRows - 1) {
-            snakeUI.drawGameOver();
             return true;
         }
         return false;
@@ -141,6 +141,7 @@ public class SnakeEntity {
         direction = DirectionType.RIGHT; // Always start moving right
         lastDirection = direction;
         growthPending = 0;
+        snakeUI.resetScore();
         initializeSnake();
     }
 
