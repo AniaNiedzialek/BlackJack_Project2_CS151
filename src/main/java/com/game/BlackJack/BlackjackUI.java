@@ -39,8 +39,9 @@ public class BlackjackUI extends Application {
         dealerBox = new HBox(10);
         dealerBox.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer");
-        VBox dealerArea = new VBox(5, dealerLabel, dealerBox);
+        VBox dealerArea = new VBox(15, dealerLabel, dealerBox);
         dealerArea.setAlignment(Pos.CENTER);
+        dealerLabel.setStyle("-fx-text-fill: yellow");
         tableLayout.setTop(dealerArea);
 
         // AI Player 1's cards (left of the screen)
@@ -49,6 +50,7 @@ public class BlackjackUI extends Application {
         Label aiPlayer1Label = new Label("AI Player 1");
         VBox aiPlayer1Area = new VBox(5, aiPlayer1Label, aiPlayer1Box);
         aiPlayer1Area.setAlignment(Pos.CENTER);
+        aiPlayer1Label.setStyle("-fx-text-fill: yellow");
         tableLayout.setLeft(aiPlayer1Area);
 
         // AI Player 2's cards (right of the screen)
@@ -57,14 +59,16 @@ public class BlackjackUI extends Application {
         Label aiPlayer2Label = new Label("AI Player 2");
         VBox aiPlayer2Area = new VBox(5, aiPlayer2Label, aiPlayer2Box);
         aiPlayer2Area.setAlignment(Pos.CENTER);
+        aiPlayer2Label.setStyle("-fx-text-fill:yellow");
         tableLayout.setRight(aiPlayer2Area);
 
         // Human Player's cards (bottom of the screen)
         playerBox = new HBox(10);
         playerBox.setAlignment(Pos.CENTER);
         Label playerLabel = new Label("You");
-        VBox playerArea = new VBox(5, playerLabel, playerBox);
+        VBox playerArea = new VBox(15, playerLabel, playerBox);
         playerArea.setAlignment(Pos.CENTER);
+        playerLabel.setStyle("-fx-text-fill : yellow");
         tableLayout.setBottom(playerArea);
 
         Button newGameButton = new Button("New Game");
