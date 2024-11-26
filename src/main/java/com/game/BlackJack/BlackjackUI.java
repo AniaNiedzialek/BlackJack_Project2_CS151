@@ -32,7 +32,8 @@ public class BlackjackUI extends Application {
 
         // Table layout
         BorderPane tableLayout = new BorderPane();
-        tableLayout.setStyle("-fx-background-color: green;");
+        tableLayout.setStyle("-fx-background-color: linear-gradient(to bottom, #121212, #0A0A0A);");
+        
 
         // Dealer's cards (top of the screen)
         dealerBox = new HBox(10);
