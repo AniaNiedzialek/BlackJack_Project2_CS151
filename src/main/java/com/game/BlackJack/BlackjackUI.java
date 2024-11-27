@@ -1,6 +1,7 @@
 package com.game.BlackJack;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,77 +30,84 @@ public class BlackjackUI extends Application {
     public void start(Stage primaryStage) {
         // Initialize Game Controller
         gameController = new GameController();
-
+    
         // Table layout
         BorderPane tableLayout = new BorderPane();
         tableLayout.setStyle("-fx-background-color: linear-gradient(to bottom, #121212, #0A0A0A);");
-        
-
+    
         // Dealer's cards (top of the screen)
         dealerBox = new HBox(10);
         dealerBox.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer");
         VBox dealerArea = new VBox(15, dealerLabel, dealerBox);
         dealerArea.setAlignment(Pos.CENTER);
+        dealerArea.setPadding(new Insets(20, 0, 20, 0)); // Add padding above and below
         dealerLabel.setStyle("-fx-text-fill: yellow");
         tableLayout.setTop(dealerArea);
-
+    
         // AI Player 1's cards (left of the screen)
         aiPlayer1Box = new HBox(10);
         aiPlayer1Box.setAlignment(Pos.CENTER);
         Label aiPlayer1Label = new Label("AI Player 1");
-        VBox aiPlayer1Area = new VBox(5, aiPlayer1Label, aiPlayer1Box);
+        VBox aiPlayer1Area = new VBox(15, aiPlayer1Label, aiPlayer1Box);
         aiPlayer1Area.setAlignment(Pos.CENTER);
+        aiPlayer1Area.setPadding(new Insets(0, 20, 0, 20)); // Add padding left and right
         aiPlayer1Label.setStyle("-fx-text-fill: yellow");
         tableLayout.setLeft(aiPlayer1Area);
-
+    
         // AI Player 2's cards (right of the screen)
         aiPlayer2Box = new HBox(10);
         aiPlayer2Box.setAlignment(Pos.CENTER);
         Label aiPlayer2Label = new Label("AI Player 2");
-        VBox aiPlayer2Area = new VBox(5, aiPlayer2Label, aiPlayer2Box);
+        VBox aiPlayer2Area = new VBox(15, aiPlayer2Label, aiPlayer2Box);
         aiPlayer2Area.setAlignment(Pos.CENTER);
-        aiPlayer2Label.setStyle("-fx-text-fill:yellow");
+        aiPlayer2Area.setPadding(new Insets(0, 20, 0, 20)); // Add padding left and right
+        aiPlayer2Label.setStyle("-fx-text-fill: yellow");
         tableLayout.setRight(aiPlayer2Area);
-
+    
         // Human Player's cards (bottom of the screen)
         playerBox = new HBox(10);
         playerBox.setAlignment(Pos.CENTER);
         Label playerLabel = new Label("You");
-        VBox playerArea = new VBox(15, playerLabel, playerBox);
-        playerArea.setAlignment(Pos.CENTER);
-        playerLabel.setStyle("-fx-text-fill : yellow");
-        tableLayout.setBottom(playerArea);
-
+        VBox playerCardsArea = new VBox(15, playerLabel, playerBox);
+        playerCardsArea.setAlignment(Pos.CENTER);
+        playerCardsArea.setPadding(new Insets(10, 0, 10, 0)); // Add padding above and below
+        playerLabel.setStyle("-fx-text-fill: yellow");
+    
+        // Control buttons below the human player's cards
         Button newGameButton = new Button("New Game");
         Button hitButton = new Button("Hit");
         Button standButton = new Button("Stand");
         Button saveButton = new Button("Save Game");
         Button loadButton = new Button("Load Game");
-
+    
         // Disable buttons until the game starts
         hitButton.setDisable(true);
         standButton.setDisable(true);
-
+    
         newGameButton.setOnAction(e -> startNewGame(hitButton, standButton));
         hitButton.setOnAction(e -> hit());
         standButton.setOnAction(e -> stand());
         saveButton.setOnAction(e -> saveGame());
         loadButton.setOnAction(e -> loadGame(primaryStage));
-
+    
         HBox buttonBox = new HBox(10, newGameButton, hitButton, standButton, saveButton, loadButton);
         buttonBox.setAlignment(Pos.CENTER);
-
-        VBox centerBox = new VBox(10, buttonBox);
-        centerBox.setAlignment(Pos.CENTER);
-        tableLayout.setCenter(centerBox);
-
+        buttonBox.setPadding(new Insets(10, 0, 10, 0)); // Add padding around buttons
+    
+        // Combine human player's cards and buttons in one VBox
+        VBox bottomArea = new VBox(10, playerCardsArea, buttonBox);
+        bottomArea.setAlignment(Pos.CENTER);
+        tableLayout.setBottom(bottomArea);
+    
         // Create and set the scene
-        Scene scene = new Scene(tableLayout, 800, 600);
-        primaryStage.setTitle("Blackjack");
+        Scene scene = new Scene(tableLayout, 900, 700); // Adjusted scene size
+        primaryStage.setTitle("BlackJack Game!");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+
 
     private void startNewGame(Button hitButton, Button standButton) {
         for (Player player : gameController.getPlayers()) {
