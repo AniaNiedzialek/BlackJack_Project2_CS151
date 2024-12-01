@@ -1,5 +1,9 @@
 package com.game;
 
+import com.game.BlackJack.BlackjackUI;
+import com.game.Snake.SnakeGameBoardTest;
+import com.game.Snake.SnakeGameController;
+
 /*
  * Manages the main functionality of the game application, including user login,
  * high score tracking, and launching games. Acts as the main hub, allowing users
@@ -176,6 +180,7 @@ public class GameManagerUI extends Application {
     Button blackjackButton = new Button("Play BlackJack");
     blackjackButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
     blackjackButton.setOnAction(e -> {
+        startBlackJackGame();
         // Start Black Jack Game
     }
     );
@@ -183,6 +188,7 @@ public class GameManagerUI extends Application {
     Button snakeButton = new Button("Play Snake");
     snakeButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
     snakeButton.setOnAction(e -> {
+        startSnakeGame();
         // Start Snake Game
     });
 
@@ -279,6 +285,16 @@ public class GameManagerUI extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void startBlackJackGame() {
+        BlackjackUI blackjackUI = new BlackjackUI();
+        blackjackUI.start(new Stage());
+    }
+
+    private void startSnakeGame() {
+        SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
+        snakeGameBoardTest.start(new Stage());
     }
 
     public static void main(String[] args) {
