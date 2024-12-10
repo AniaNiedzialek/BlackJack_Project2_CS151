@@ -1,6 +1,8 @@
 package com.game.Snake;
 
 import com.game.DirectionType;
+import com.game.ScoreTracker;
+import com.game.UserAccountManager;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -17,13 +19,15 @@ public class SnakeGameController {
     private final SnakeFoodItem foodItem;
     private final SnakeGameBoard gameBoard;
     private AnimationTimer gameLoop;
+    private ScoreTracker scoreTracker;
+    private UserAccountManager userManager;
+    private Runnable onMainMenuRequest;
     private boolean isRunning = false;
     private boolean isGameOver = false;
     private final int gridWidth;
     private final int gridHeight;
     private static final long MOVE_INTERVAL = 800_000_00L;
     private static final long FRAME_INTERVAL = 16_666_667;
-    private Runnable onMainMenuRequest;
 
     /*
      * Initializes the game controller with necessary components.
@@ -35,6 +39,8 @@ public class SnakeGameController {
         this.gridHeight = gridHeight;
         this.snake = snake;
         this.foodItem = foodItem;
+        this.scoreTracker = new ScoreTracker();
+        this.userManager = new UserAccountManager();
         
         GraphicsContext gc = canvas.getGraphicsContext2D();
         this.snakeUI = new SnakeUI(gc, canvas, snake, foodItem, gameBoard);
@@ -153,10 +159,25 @@ public class SnakeGameController {
             return;
         }
 
+        if (snake.hasWon()) {
+            handleWin();
+            return;
+        }
+
         if (snake.getHeadPosition().equals(foodItem.getPosition())) {
             snake.grow();
             foodItem.spawnFood(snake.getSegmenets());
         }
+    }
+
+    /*
+     * Method to handle if the player has won
+     */
+    private void handleWin() {
+        isGameOver = true;
+        isRunning = false;
+        saveScore();
+        snakeUI.drawWinScreen(); // You'll need to create this method
     }
 
     /*
@@ -182,5 +203,12 @@ public class SnakeGameController {
 
     public boolean isGameOver() {
         return isGameOver;
+    }
+
+    private void saveScore() {
+        // String currentUser = userManager.getCurrentUser();
+        // if (currentUser != null) {
+            // scoreTracker.addScore(currentUser, snakeUI.getScore(), "Snake");
+        // }
     }
 }

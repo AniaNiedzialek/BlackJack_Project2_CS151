@@ -136,10 +136,9 @@ public class SnakeUI {
     }
 
     /*
-     * Displays the game over screen with final score and menu options.
-     * Includes a semi-transparent overlay on the final game state.
+     * Common helper method to draw end game screen (win or game over)
      */
-    public void drawGameOver() {
+    private void drawEndGameScreen(String mainText, Color mainColor, String scoreText) {
         // Show final game state
         drawSnake();
         
@@ -147,27 +146,54 @@ public class SnakeUI {
         gc.setFill(new Color(0, 0, 0, 0.65));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw game over text
-        gc.setFill(Color.RED);
+        // Draw main text
+        gc.setFill(mainColor);
         gc.setFont(new Font("Arial Bold", 48));
         gc.setEffect(new Glow(0.8));
-        gc.fillText("GAME OVER", canvas.getWidth() / 2 - 150, canvas.getHeight() / 4);
+        gc.fillText(mainText, canvas.getWidth() / 2 - calculateTextOffset(mainText), canvas.getHeight() / 4);
         
-        // Draw final score
+        // Draw score
         gc.setFill(Color.LIMEGREEN);
         gc.setFont(new Font("Arial", 36));
         gc.setEffect(new Glow(0.6));
-        gc.fillText("Score: " + score, canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
+        gc.fillText(scoreText + score, canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
         gc.setEffect(null);
     
-        // Position and show menu
-        gameOverMenu.setLayoutX((canvas.getWidth() - 200) / 2);
+        showEndGameMenu();
+    }
+
+    /*
+     * Helper method to calculate text offset for centering
+     */
+    private double calculateTextOffset(String text) {
+        return text.length() * 17; // Approximate width per character
+    }
+
+    /*
+     * Helper method to show and position the menu
+     */
+    private void showEndGameMenu() {
+        gameOverMenu.setLayoutX((canvas.getWidth() - 100) / 2);
         gameOverMenu.setLayoutY(canvas.getHeight() / 1.5);
         gameOverMenu.setVisible(true);
         
         if (!gameBoard.getChildren().contains(gameOverMenu)) {
             gameBoard.getChildren().add(gameOverMenu);
         }
+    }
+
+    /*
+     * Draw game over screen using helper method
+     */
+    public void drawGameOver() {
+        drawEndGameScreen("GAME OVER", Color.RED, "Score: ");
+    }
+
+    /*
+     * Draw win screen using helper method
+     */
+    public void drawWinScreen() {
+        drawEndGameScreen("YOU WIN!", Color.GOLD, "Final Score: ");
     }
 
     /*
@@ -284,13 +310,14 @@ public class SnakeUI {
     public void hideGameOverMenu() {
         gameOverMenu.setVisible(false);
         gameBoard.getChildren().remove(gameOverMenu);
+        gameBoard.requestFocus();
     }
 
     /*
      * Increments the game score.
      */
     public void incrementScore() {
-        score++;
+        score = score + 100;
     }
 
     /*
