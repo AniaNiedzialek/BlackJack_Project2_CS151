@@ -8,6 +8,7 @@ import com.game.ToolBarUI;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,48 +17,46 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/*
+ * Entry point for the Snake game. Handles menus, game start, pause, and exit functionality.
+ */
 public class SnakeGameBoardTest extends Application {
-    private SnakeGameBoard gameBoard;
-    private VBox pauseMenu;
-    private VBox mainMenu;
-    private boolean isFirstStart = true;
+    private SnakeGameBoard gameBoard; // Main game board
+    private VBox pauseMenu;           // Pause menu layout
+    private VBox mainMenu;            // Main menu layout
 
-    double width = 800;
-    double height = 600;
+    private static final double WIDTH = 800; // Game width
+    private static final double HEIGHT = 600; // Game height
 
     @Override
     public void start(Stage primaryStage) {
-        gameBoard = new SnakeGameBoard(width, height);
+        // Initialize the game board
+        gameBoard = new SnakeGameBoard(WIDTH, HEIGHT);
         Scene scene = new Scene(gameBoard);
 
-        // Create menus
+        // Configure main menu callback
+        gameBoard.getSnakeController().setOnMainMenuRequest(this::returnToMainMenu);
+
+        // Initialize menus
         mainMenu = createMainMenu();
         pauseMenu = createPauseMenu();
-        
-        // Initially show main menu and hide pause menu
+
+        // Display main menu initially
         mainMenu.setVisible(true);
         pauseMenu.setVisible(false);
-        
-        // Set menu styles
+
+        // Apply styles to menus
         String menuStyle = "-fx-background-color: rgba(0, 0, 0, 0.85);";
         mainMenu.setStyle(menuStyle);
         pauseMenu.setStyle(menuStyle);
-        
-        // Add menus to game board
+
+        // Add menus to the game board
         gameBoard.getChildren().addAll(mainMenu, pauseMenu);
 
+        // Handle key events for game controls
         scene.setOnKeyPressed(event -> {
-            System.out.println("Key pressed: " + event.getCode());
-
-            // If main menu is visible, only handle specific menu keys
-            if (mainMenu.isVisible()) {
-                return;
-            }
-
-            // If pause menu is visible, only handle ESCAPE
-            if (pauseMenu.isVisible() && event.getCode() != javafx.scene.input.KeyCode.ESCAPE) {
-                return;
-            }
+            if (mainMenu.isVisible()) return; // Ignore keys if main menu is visible
+            if (pauseMenu.isVisible() && event.getCode() != javafx.scene.input.KeyCode.ESCAPE) return;
 
             switch (event.getCode()) {
                 case ESCAPE:
@@ -68,32 +67,31 @@ public class SnakeGameBoardTest extends Application {
                     }
                     break;
                 case UP:
-                    System.out.println("Up pressed");
                     gameBoard.getSnakeController().updateSnakeDirection(DirectionType.UP);
                     break;
                 case DOWN:
-                    System.out.println("Down pressed");
                     gameBoard.getSnakeController().updateSnakeDirection(DirectionType.DOWN);
                     break;
                 case LEFT:
-                    System.out.println("Left pressed");
                     gameBoard.getSnakeController().updateSnakeDirection(DirectionType.LEFT);
                     break;
                 case RIGHT:
-                    System.out.println("Right pressed");
                     gameBoard.getSnakeController().updateSnakeDirection(DirectionType.RIGHT);
                     break;
                 default:
-                    System.out.println("Unhandled key: " + event.getCode());
                     break;
             }
         });
 
+        // Set up the stage
         primaryStage.setTitle("Snake Game");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /*
+     * Creates the main menu layout.
+     */
     private VBox createMainMenu() {
         VBox menu = new VBox(20);
         menu.setAlignment(Pos.CENTER);
@@ -106,12 +104,8 @@ public class SnakeGameBoardTest extends Application {
         Button startButton = new Button("Start Game");
         Button exitButton = new Button("Exit Game");
 
-        String buttonStyle = "-fx-background-color: #4CAF50; " +
-                           "-fx-text-fill: white; " +
-                           "-fx-font-size: 16px; " +
-                           "-fx-min-width: 150px; " +
-                           "-fx-min-height: 40px;";
-
+        String buttonStyle = "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; " +
+                "-fx-min-width: 150px; -fx-min-height: 40px;";
         startButton.setStyle(buttonStyle);
         exitButton.setStyle(buttonStyle);
 
@@ -122,6 +116,9 @@ public class SnakeGameBoardTest extends Application {
         return menu;
     }
 
+    /*
+     * Creates the pause menu layout.
+     */
     private VBox createPauseMenu() {
         VBox menu = new VBox(20);
         menu.setAlignment(Pos.CENTER);
@@ -135,12 +132,8 @@ public class SnakeGameBoardTest extends Application {
         Button mainMenuButton = new Button("Main Menu");
         Button exitButton = new Button("Exit Game");
 
-        String buttonStyle = "-fx-background-color: #4CAF50; " +
-                           "-fx-text-fill: white; " +
-                           "-fx-font-size: 16px; " +
-                           "-fx-min-width: 150px; " +
-                           "-fx-min-height: 40px;";
-
+        String buttonStyle = "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; " +
+                "-fx-min-width: 150px; -fx-min-height: 40px;";
         resumeButton.setStyle(buttonStyle);
         mainMenuButton.setStyle(buttonStyle);
         exitButton.setStyle(buttonStyle);
@@ -153,32 +146,44 @@ public class SnakeGameBoardTest extends Application {
         return menu;
     }
 
+    /*
+     * Starts a new game by resetting the game board.
+     */
     private void startNewGame() {
         mainMenu.setVisible(false);
         pauseMenu.setVisible(false);
         gameBoard.getSnakeController().resetGame();
         gameBoard.getSnakeController().startGame();
         gameBoard.requestFocus();
-        isFirstStart = false;
     }
 
+    /*
+     * Pauses the game and shows the pause menu.
+     */
     private void pauseGame() {
         gameBoard.getSnakeController().stopGame();
         pauseMenu.setVisible(true);
     }
 
+    /*
+     * Resumes the game from the pause menu.
+     */
     private void resumeGame() {
         pauseMenu.setVisible(false);
-        // Don't reset the game, just restart the game loop
-        if (gameBoard.getSnakeController() != null) {
-            gameBoard.getSnakeController().startGame();
-            gameBoard.requestFocus();
-        }
+        gameBoard.getSnakeController().startGame();
+        gameBoard.requestFocus();
     }
 
+    /*
+     * Returns to the main menu, resetting the game board.
+     */
     private void returnToMainMenu() {
         pauseMenu.setVisible(false);
         mainMenu.setVisible(true);
+
+        GraphicsContext gc = gameBoard.getCanvas().getGraphicsContext2D();
+        gc.clearRect(0, 0, gameBoard.getCanvas().getWidth(), gameBoard.getCanvas().getHeight());
+        gameBoard.drawBorder(); // Optional: redraw border
         gameBoard.getSnakeController().stopGame();
         gameBoard.getSnakeController().resetGame();
     }
