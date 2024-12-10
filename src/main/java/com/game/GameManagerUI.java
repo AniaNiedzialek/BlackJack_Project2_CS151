@@ -11,6 +11,8 @@ import com.game.Snake.SnakeGameController;
  * and high score management.
  */
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,6 +25,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -153,7 +158,7 @@ public class GameManagerUI extends Application {
         stage.setScene(accountScene);
     }
 
-    private void showMainApp(Stage stage) {
+    public void showMainApp(Stage stage) {
     // Main layout
     BorderPane mainLayout = new BorderPane();
     mainLayout.setStyle("-fx-background-color: #1E1E2F;");
@@ -211,51 +216,52 @@ public class GameManagerUI extends Application {
 
     gameOptionsBox.getChildren().addAll(gameOptionsTitle, gameButtonsBox);
 
-    // Right side - High Scores section (40% of the width)
+    // Right side - High Scores section
     VBox highScoresBox = new VBox(15);
     highScoresBox.setPadding(new Insets(20));
     highScoresBox.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
-    highScoresBox.setAlignment(Pos.TOP_CENTER); // Align to the top to avoid empty space below
+    highScoresBox.setAlignment(Pos.TOP_CENTER);
 
     // Title for the high scores section
     Text highScoresTitle = new Text("Top 5 High Scores");
     highScoresTitle.setFont(Font.font("Arial", 24)); // Adjusted font size
     highScoresTitle.setFill(Color.WHITE);
 
-    // Example high scores (dynamically loaded)
-    ListView<String> highScoresList = new ListView<>();
-    highScoresList.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+    // Create a container for both leaderboards
+    HBox leaderboardsBox = new HBox(20);
+    leaderboardsBox.setAlignment(Pos.CENTER);
 
-    // Set the cell factory to apply background and text color to each ListCell
-    highScoresList.setCellFactory(lv -> {
-        ListCell<String> cell = new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
-                } else {
-                    setText(item);
-                    setFont(Font.font("Arial", 16));
-                    setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
-                }
-            }
-        };
-        return cell;
-    });
+    // Blackjack leaderboard
+    VBox blackjackScoresBox = new VBox(10);
+    blackjackScoresBox.setAlignment(Pos.TOP_CENTER);
+    Text blackjackTitle = new Text("BlackJack");
+    blackjackTitle.setFont(Font.font("Arial", 18));
+    blackjackTitle.setFill(Color.WHITE);
 
-    // Add sample high scores (this could be dynamically loaded in your app)
-    highScoresList.getItems().addAll(
-        "BlackJack - Player1: 1000", 
-        "Snake - Player2: 950", 
-        "BlackJack - Player3: 900",
-        "Snake - Player4: 850", 
-        "BlackJack - Player5: 800"
-    );
+    ListView<String> blackjackScoresList = new ListView<>();
+    fillHighScore(blackjackScoresList, "blackjack");
+    blackjackScoresList.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
 
-    // Add the title and leaderboard list to the VBox
-    highScoresBox.getChildren().addAll(highScoresTitle, highScoresList);
+    // Snake leaderboard
+    VBox snakeScoresBox = new VBox(10);
+    snakeScoresBox.setAlignment(Pos.TOP_CENTER);
+    Text snakeTitle = new Text("Snake");
+    snakeTitle.setFont(Font.font("Arial", 18));
+    snakeTitle.setFill(Color.WHITE);
+
+    ListView<String> snakeScoresList = new ListView<>();
+    fillHighScore(snakeScoresList, "snake");
+    snakeScoresList.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+
+    // Add titles and lists to their respective boxes
+    blackjackScoresBox.getChildren().addAll(blackjackTitle, blackjackScoresList);
+    snakeScoresBox.getChildren().addAll(snakeTitle, snakeScoresList);
+
+    // Add both leaderboards to the container
+    leaderboardsBox.getChildren().addAll(blackjackScoresBox, snakeScoresBox);
+
+    // Add the title and leaderboard container to the highScoresBox
+    highScoresBox.getChildren().addAll(highScoresTitle, leaderboardsBox);
 
     // Create a horizontal split layout with 60% for left side and 40% for right side
     HBox contentLayout = new HBox(20);
@@ -276,6 +282,8 @@ public class GameManagerUI extends Application {
     Scene mainScene = new Scene(mainLayout, 800, 600);
     stage.setTitle("Sunny Games");
     stage.setScene(mainScene);
+    stage.centerOnScreen(); // Ensure the stage is centered on the screen
+    stage.show();
 }
 
     // Show alert with a given title and message
@@ -293,8 +301,25 @@ public class GameManagerUI extends Application {
     }
 
     private void startSnakeGame() {
+        ScoreTracker.writeScoreFile("FlabbHS", "BlackJack" , "123");
         SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
         snakeGameBoardTest.start(new Stage());
+    }
+
+    private void fillHighScore(ListView<String> scoresList, String gameName) {
+        List<String[]> fileScores = new ScoreTracker().readScoreFile();
+        List<String[]> gameScores = new ArrayList<>();
+        for (String[] score : fileScores) {
+            if(score[0].equalsIgnoreCase(gameName)) {
+                gameScores.add(score);
+            }
+        }
+        ObservableList<String> playerScores = FXCollections.observableArrayList();
+        for (String[] score : gameScores) {
+            String scoreEntry = score[1] + " | Score: " + score[2];
+            playerScores.add(scoreEntry);
+        }
+        scoresList.setItems(playerScores);
     }
 
     public static void main(String[] args) {
