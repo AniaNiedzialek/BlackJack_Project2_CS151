@@ -19,7 +19,7 @@ public class SnakeGameController {
     private boolean isGameOver = false;
 
     // Constants for smooth movement
-    private static final long MOVE_INTERVAL = 900_000_00L; // Time between actual moves (150ms)
+    private static final long MOVE_INTERVAL = 700_000_00L; // Time between actual moves (150ms)
     private static final long FRAME_INTERVAL = 16_666_667; // ~60 FPS (16.67ms)
 
     public SnakeGameController(SnakeGameBoard gameBoard, Canvas canvas, int gridWidth, int gridHeight, SnakeEntity snake, SnakeFoodItem foodItem) {
