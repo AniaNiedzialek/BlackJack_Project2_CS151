@@ -35,10 +35,11 @@ public class SnakeGameBoard extends StackPane {
 
         // Center the canvas in the StackPane
         this.setAlignment(javafx.geometry.Pos.CENTER);
+        this.getChildren().add(canvas);
     
         // Unified background style for both game and menus
         String backgroundStyle = "-fx-background-color: linear-gradient(to bottom, #121212, #0A0A0A);";
-        this.setStyle(backgroundStyle);
+        this.setStyle(backgroundStyle); // Apply the unified style
 
         // Calculate grid dimensions
         gridColumns = (int) (adjustedWidth / CELL_SIZE);
@@ -62,11 +63,9 @@ public class SnakeGameBoard extends StackPane {
      */
     public void drawBorder() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear the canvas
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(5);
-        
-        double offset = gc.getLineWidth() / 2; // Adjust for stroke width
-        gc.strokeRect(offset, offset, canvas.getWidth() - gc.getLineWidth(), canvas.getHeight() - gc.getLineWidth());
+        gc.setStroke(Color.YELLOW);
+        gc.setLineWidth(2);
+        gc.strokeRect(1, 1, canvas.getWidth() - 2, canvas.getHeight() - 2);
     }
 
     /*
