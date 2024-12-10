@@ -38,7 +38,7 @@ public class SnakeGameBoard extends StackPane {
         this.getChildren().add(canvas);
     
         // Unified background style for both game and menus
-        String backgroundStyle = "-fx-background-color: linear-gradient(to bottom, #121212, #0A0A0A);";
+       String backgroundStyle = "-fx-background-color: linear-gradient(to bottom, #1a1a2e, #16213e);";
         this.setStyle(backgroundStyle); // Apply the unified style
 
         // Calculate grid dimensions
@@ -63,7 +63,7 @@ public class SnakeGameBoard extends StackPane {
      */
     public void drawBorder() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear the canvas
-        gc.setStroke(Color.YELLOW);
+        gc.setStroke(Color.web("#00ffff")); // Bright cyan for Tron-like effect
         gc.setLineWidth(2);
         gc.strokeRect(1, 1, canvas.getWidth() - 2, canvas.getHeight() - 2);
     }

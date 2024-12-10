@@ -29,33 +29,33 @@ import javafx.scene.text.Font;
  */
 public class SnakeUI {
     // Constants 
-    /** Size of each cell in the game grid */
+    /* Size of each cell in the game grid */
     private static final double CELL_SIZE = 15;
-    /** Width of the snake body */
-    private static final double SNAKE_WIDTH = CELL_SIZE;
-    /** Used for gradient animations */
+    /* Width of the snake body */
+    private static final double SNAKE_WIDTH = 15;
+    /* Used for gradient animations */
     private double gradientOffset = 0;
 
     // Core Components
-    /** Graphics context for drawing on the canvas */
+    /* Graphics context for drawing on the canvas */
     private final GraphicsContext gc;
-    /** Canvas where the game is rendered */
+    /* Canvas where the game is rendered */
     private final Canvas canvas;
-    /** Reference to the snake entity for position data */
+    /* Reference to the snake entity for position data */
     private final SnakeEntity snake;
-    /** Reference to food item for position data */
+    /* Reference to food item for position data */
     private final SnakeFoodItem foodItem;
-    /** Reference to the main game board */
+    /* Reference to the main game board */
     private final SnakeGameBoard gameBoard;
-    /** Current game score */
+    /* Current game score */
     private int score = 0;
 
     // Menu Components
-    /** Container for game over menu elements */
+    /* Container for game over menu elements */
     private final VBox gameOverMenu;
-    /** Button to restart the game */
+    /* Button to restart the game */
     private final Button restartButton;
-    /** Button to return to main menu */
+    /* Button to return to main menu */
     private final Button mainMenuButton;
 
     /*
@@ -102,22 +102,30 @@ public class SnakeUI {
         Button button = new Button(text);
         
         // Define base button style
-        String buttonStyle = "-fx-background-color: #4CAF50; " +
-                           "-fx-text-fill: white; " +
-                           "-fx-font-size: 18px; " +
-                           "-fx-padding: 15 50; " +
-                           "-fx-background-radius: 5; " +
-                           "-fx-cursor: hand; " +
-                           "-fx-min-width: 200px;";
+        String buttonStyle = "-fx-background-color: #1a472a; " +
+                            "-fx-text-fill: #98ff98; " +
+                            "-fx-font-size: 16px; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-min-width: 200px; " +
+                            "-fx-min-height: 45px; " +
+                            "-fx-background-radius: 5; " +
+                            "-fx-border-radius: 5; " +
+                            "-fx-border-color: #2ecc71; " +
+                            "-fx-border-width: 2; " +
+                            "-fx-cursor: hand;";
         
         // Define hover effect style
-        String hoverStyle = "-fx-background-color: #5DBE60; " +
-                          "-fx-text-fill: white; " +
-                          "-fx-font-size: 18px; " +
-                          "-fx-padding: 15 50; " +
-                          "-fx-background-radius: 5; " +
-                          "-fx-cursor: hand; " +
-                          "-fx-min-width: 200px;";
+        String hoverStyle = "-fx-background-color: #2ecc71; " +
+                           "-fx-text-fill: #ffffff; " +
+                           "-fx-font-size: 16px; " +
+                           "-fx-font-weight: bold; " +
+                           "-fx-min-width: 200px; " +
+                           "-fx-min-height: 45px; " +
+                           "-fx-background-radius: 5; " +
+                           "-fx-border-radius: 5; " +
+                           "-fx-border-color: #1a472a; " +
+                           "-fx-border-width: 2; " +
+                           "-fx-cursor: hand;";
         
         // Apply styles and hover effects
         button.setStyle(buttonStyle);
@@ -195,8 +203,8 @@ public class SnakeUI {
         // Create gradient effect for snake body
         LinearGradient gradient = new LinearGradient(
             0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.LIMEGREEN),
-            new Stop(1, Color.DARKGREEN)
+            new Stop(0, Color.web("#00ff87")), // Bright mint green
+            new Stop(1, Color.web("#00cc69"))  // Slightly darker mint
         );
         
         gc.setStroke(gradient);
@@ -224,13 +232,19 @@ public class SnakeUI {
         double x = headPos.getX() * CELL_SIZE + CELL_SIZE / 2;
         double y = headPos.getY() * CELL_SIZE + CELL_SIZE / 2;
         
-        // Draw head outline
-        gc.setFill(Color.DARKGREEN);
+        // Draw head outline with glow
+        gc.setFill(Color.web("#00cc69"));
         gc.fillOval(x - SNAKE_WIDTH / 2 - 1, y - SNAKE_WIDTH / 2 - 1, SNAKE_WIDTH + 2, SNAKE_WIDTH + 2);
         
-        // Draw head interior
-        gc.setFill(Color.LIMEGREEN);
+        // Draw head interior with brighter color
+        gc.setFill(Color.web("#50ff1c"));
         gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
+
+        // Add glow effect
+        Glow glow = new Glow(0.5);
+        gc.setEffect(glow);
+        gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
+        gc.setEffect(null);
     }
 
     /*
@@ -246,8 +260,8 @@ public class SnakeUI {
         RadialGradient gradient = new RadialGradient(
             0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
             false, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.YELLOW),
-            new Stop(1, Color.RED)
+            new Stop(0, Color.web("#00FFFF")), // Bright cyan
+            new Stop(1, Color.web("#0099FF"))  // Sky blue
         );
         
         gc.setFill(gradient);
