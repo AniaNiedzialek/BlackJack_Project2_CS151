@@ -56,9 +56,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.game.GameManagerUI</mainClass>
+                    <!-- <mainClass>com.game.GameManagerUI</mainClass> -->
                     <!-- <mainClass>com.game.BlackJack.BlackjackUI</mainClass> -->
-                    <!--mainClass>com.game.Snake.SnakeGameBoardTest</mainClass-->
+                    <mainClass>com.game.Snake.SnakeGameBoardTest</mainClass>
                 </configuration>
             </plugin>
         </plugins>
