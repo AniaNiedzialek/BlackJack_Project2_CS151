@@ -20,7 +20,7 @@ public class ScoreTracker {
     private static final String FILE_NAME = "high_scores.txt";
 
     // Write to high_scores.txt
-    public static void writeScoreFile(String accountName, String gameName, String gameScore) {
+    public static void writeScoreFile(String gameName, String accountName, String gameScore) {
         // Create writer
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             writer.write(gameName + " " + accountName + " " + gameScore + "\n");
