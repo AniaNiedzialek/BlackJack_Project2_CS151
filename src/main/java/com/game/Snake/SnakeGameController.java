@@ -2,6 +2,7 @@ package com.game.Snake;
 
 import com.game.DirectionType;
 import com.game.ScoreTracker;
+import com.game.SessionManager;
 import com.game.UserAccountManager;
 
 import javafx.animation.AnimationTimer;
@@ -189,6 +190,7 @@ public class SnakeGameController {
         isGameOver = true;
         isRunning = false;
         snakeUI.drawGameOver();
+        ScoreTracker.writeScoreFile("snake", SessionManager.getInstance().getCurrentUser(), SessionManager.getInstance().getCurrentScore()) ;
     }
 
     /*
