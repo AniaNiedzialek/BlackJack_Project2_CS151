@@ -2,7 +2,6 @@ package com.game;
 
 import com.game.BlackJack.BlackjackUI;
 import com.game.Snake.SnakeGameBoardTest;
-import com.game.Snake.SnakeGameController;
 
 /*
  * Manages the main functionality of the game application, including user login,
@@ -38,7 +37,7 @@ public class GameManagerUI extends Application {
         showLoginScreen(primaryStage);
     }
 
-    String currentUser = "";
+    String currentUsername = "";
 
     private void showLoginScreen(Stage stage) {
         // Login form layout
@@ -68,7 +67,7 @@ public class GameManagerUI extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
             if (UserAccountManager.checkLoginInfo(username, password)) {
-                currentUser = username;
+                currentUsername = username;
                 showMainApp(stage); // Navigate to main UI after login
             } else {
                 showAlert("Error", "Username or password is incorrect.");
@@ -299,13 +298,13 @@ public class GameManagerUI extends Application {
     }
 
     private void startBlackJackGame() {
-        ScoreTracker.writeScoreFile("blackjack", currentUser, "1000");
+        SessionManager.getInstance().setCurrentUser(currentUsername);
         BlackjackUI blackjackUI = new BlackjackUI();
         blackjackUI.start(new Stage());
     }
 
     private void startSnakeGame() {
-        ScoreTracker.writeScoreFile("snake", currentUser , "1000");
+        SessionManager.getInstance().setCurrentUser(currentUsername);
         SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
         snakeGameBoardTest.start(new Stage());
     }
