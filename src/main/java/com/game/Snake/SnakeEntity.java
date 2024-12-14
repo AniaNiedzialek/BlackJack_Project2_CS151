@@ -9,73 +9,83 @@ import com.game.DirectionType;
 
 import javafx.geometry.Point2D;
 
+/*
+ * Represents the snake entity in the game, handling its movement, growth,
+ * and collision detection. This class maintains the snake's position,
+ * direction, and size.
+ */
 public class SnakeEntity {
-    private static final double CELL_SIZE = 15; // Matched with SnakeUI.CELL_SIZE
+    private static final double CELL_SIZE = 15;
     private List<Point2D> segments;
     private DirectionType direction;
-    private DirectionType lastDirection; // Add this to track the last direction
+    private DirectionType lastDirection;
     private Random random = new Random();
     private SnakeGameBoard gameBoard;
     private SnakeUI snakeUI;
     private int growthPending;
-    private final int gridColumns; // Number of columns in the grid
-    private final int gridRows;    // Number of rows in the grid
-    private int score = 0; // Track the score of food
+    private final int gridColumns;
+    private final int gridRows;
+    private final int maxPossibleLength;
+    private boolean hasWon = false;
     
+    /*
+     * Creates a new snake entity with specified grid dimensions.
+     */
     public SnakeEntity(SnakeGameBoard gameBoard, int gridColumns, int gridRows) {
         this.segments = new LinkedList<>();
-        this.direction = getRandomDirection(); // Always start moving right
+        this.direction = getRandomDirection();
         this.lastDirection = direction;
         this.growthPending = 0;
         this.gameBoard = gameBoard;
         this.gridColumns = gridColumns;
         this.gridRows = gridRows;
+        this.maxPossibleLength = (gridColumns - 2) * (gridRows - 2);
     }
 
-        // Setter for SnakeUI
-        public void setSnakeUI(SnakeUI snakeUI) {
-            this.snakeUI = snakeUI;
-        }
+    /*
+     * Sets the UI reference for score updates.
+     */
+    public void setSnakeUI(SnakeUI snakeUI) {
+        this.snakeUI = snakeUI;
+    }
 
-    // Initialize snake with random direction
+    /*
+     * Initializes the snake in the center of the grid with random direction.
+     */
     public void initializeSnake() {
-        // Clear existing segments
         segments.clear();
-
-        // Use grid dimensions
-        int centerX = gridColumns / 2; 
+        int centerX = gridColumns / 2;
         int centerY = gridRows / 2;
-
-        // Start with a random direction
         direction = getRandomDirection();
-        lastDirection = direction; // Keep lastDirection consistent
+        lastDirection = direction;
 
-        // Initialize the snake's body based on the random direction
         for (int i = 0; i < 3; i++) {
             Point2D segment = switch (direction) {
-                case UP -> new Point2D(centerX, centerY + i); // Extend downward
-                case DOWN -> new Point2D(centerX, centerY - i); // Extend upward
-                case LEFT -> new Point2D(centerX + i, centerY); // Extend rightward
-                case RIGHT -> new Point2D(centerX - i, centerY); // Extend leftward
+                case UP -> new Point2D(centerX, centerY + i);
+                case DOWN -> new Point2D(centerX, centerY - i);
+                case LEFT -> new Point2D(centerX + i, centerY);
+                case RIGHT -> new Point2D(centerX - i, centerY);
             };
             segments.add(segment);
         }
     }
-        
+
+    /*
+     * Generates a random direction for the snake.
+     */
     private DirectionType getRandomDirection() {
         DirectionType[] directions = DirectionType.values();
         return directions[random.nextInt(directions.length)];
     }
 
+    /*
+     * Moves the snake one unit in its current direction.
+     */
     public void move() {
         int[] offset = direction.getMovementOffset();
-        // Create a new head position based on current head and direction
         Point2D newHead = segments.get(0).add(offset[0], offset[1]);
         segments.add(0, newHead);
-        lastDirection = direction; // Update last direction after successful move
-
-        // Debugging 
-        System.out.println("Snake moved to: " + newHead);
+        lastDirection = direction;
 
         if (growthPending > 0) {
             growthPending--;
@@ -84,14 +94,24 @@ public class SnakeEntity {
         }
     }
 
+    /*
+     * Increases the snake's length and updates the score.
+     */
     public void grow() {
-        growthPending++; 
+        growthPending++;
         snakeUI.incrementScore();
+
+        // Check if snake has reached maximum possible length
+        if (segments.size() + growthPending >= maxPossibleLength) {
+            hasWon = true;
+        }
     }
 
+    /*
+     * Checks if the snake's head collides with its body.
+     */
     public boolean hasSelfCollision() {
         Point2D head = segments.get(0);
-        // Start checking from the fourth segment to allow for tighter turns
         for (int i = 4; i < segments.size(); i++) {
             if (segments.get(i).equals(head)) {
                 return true;
@@ -100,55 +120,61 @@ public class SnakeEntity {
         return false;
     }
 
-
-    // Check if the head of the snake hits the boundaries
-    // Subtract 1 from gridColumns and gridRows to account for zero-based indexing
-    // This ensures the snake dies exactly when it touches the border
+    /*
+     * Checks if the snake has hit the game boundaries.
+     */
     public boolean hasHitBoundary() {
         Point2D head = segments.get(0);
-
-        // Covert grid coordinates to actual pixels coordinates
         double x = head.getX();
         double y = head.getY();
-
-        // Debug output
-        System.out.println("Snake Head Position: (" + x + ", " + y + ")");
-        System.out.println("Grid Dimensions: " + gridColumns + "x" + gridRows);
-
-        // Check if the head of the snake git the boundaries
-        if (x <= 0 || x >= gridColumns - 1 || y <= 0 || y >= gridRows - 1) {
-            return true;
-        }
-        return false;
+        return x <= 0 || x >= gridColumns - 1 || y <= 0 || y >= gridRows - 1;
     }
 
+    /*
+     * Boolean method to check if the plaer has won 
+     */
+    public boolean hasWon() {
+        return hasWon;
+    }
+
+    /*
+     * Updates the snake's direction unless it would result in a 180-degree turn.
+     */
     public void setSnakeDirection(DirectionType newDirection) {
-        // Prevent 180-degree turns by checking against last direction
         if (!lastDirection.isOpposite(newDirection)) {
             this.direction = newDirection;
-            System.out.println("Direction changed to: " + this.direction);
-        } else {
-            System.out.println("Invalid direction change prevented: " + newDirection);
         }
     }
 
+    /*
+     * Returns the current direction of the snake.
+     */
     public DirectionType getSnakeDirection() {
         return this.direction;
     }
 
+    /*
+     * Resets the snake to its initial state.
+     */
     public void reset() {
         segments.clear();
-        direction = DirectionType.RIGHT; // Always start moving right
+        direction = DirectionType.RIGHT;
         lastDirection = direction;
         growthPending = 0;
         snakeUI.resetScore();
         initializeSnake();
     }
 
+    /*
+     * Returns the position of the snake's head.
+     */
     public Point2D getHeadPosition() {
         return segments.get(0);
     }
 
+    /*
+     * Returns a copy of the snake's body segments.
+     */
     public List<Point2D> getSegmenets() {
         return new ArrayList<>(segments);
     }

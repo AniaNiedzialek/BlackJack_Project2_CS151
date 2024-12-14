@@ -1,5 +1,8 @@
 package com.game;
 
+import com.game.BlackJack.BlackjackUI;
+import com.game.Snake.SnakeGameBoardTest;
+
 /*
  * Manages the main functionality of the game application, including user login,
  * high score tracking, and launching games. Acts as the main hub, allowing users
@@ -7,173 +10,325 @@ package com.game;
  * and high score management.
  */
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 public class GameManagerUI extends Application {
 
-    private Scene mainMenuScene;
-
     @Override
     public void start(Stage primaryStage) {
-
-        // Create title
-        Label titleLabel = new Label("Welcome to Sunny Games");
-        titleLabel.setStyle("-fx-font-size: 40px;");
-
-        // Create login button
-        Button loginButton = new Button("Login");
-        loginButton.setFont(new Font("Georgia", 20));
-        loginButton.setPrefSize(100, 30);
-        loginButton.setOnAction(e -> showLoginForm(primaryStage)); // Show login form
-
-        // Create "create account" button
-        Button accountButton = new Button("Create Account");
-        accountButton.setFont(new Font("Georgia", 20));
-        accountButton.setPrefSize(200, 30);
-        accountButton.setOnAction(e -> showAccountForm(primaryStage));
-
-        // Create View Leaderboard button
-        Button leaderboardButton = new Button("View Leaderboard");
-        leaderboardButton.setFont(new Font("Georgia", 20));
-        leaderboardButton.setPrefHeight(30);
-        
-
-        // Add toolbar from toolbarUI
-        ToolBarUI toolbar = new ToolBarUI();
-
-        // Create stack pane for toolbar
-        StackPane toolbarContainer = new StackPane();
-        toolbarContainer.setStyle("-fx-background-color: #ECECEC; -fx-border-color: #DEDEDE; -fx-border-width: 2px; -fx-border-radius: 5;");
-        toolbarContainer.getChildren().addAll(toolbar);
-
-        // Create vbox
-        VBox vbox = new VBox(20);
-        vbox.setPadding(new Insets(2)); // 15px padding      
-        vbox.setAlignment(Pos.TOP_CENTER);
-
-        // Create an HBox for the buttons
-        HBox hbox = new HBox(15); // 20px spacing between the buttons
-        hbox.setPadding(new Insets(2)); // 15px padding      
-        hbox.setAlignment(Pos.CENTER);
-        hbox.setStyle("-fx-background-color: #ECECEC; -fx-border-color: #DEDEDE; -fx-border-width: 2px; -fx-border-radius: 5;");
-
-        // Add buttons to hbox
-        hbox.getChildren().addAll(titleLabel, loginButton, accountButton, leaderboardButton);
-
-        vbox.getChildren().setAll(toolbarContainer, titleLabel, hbox);
-
-        // Set primary scene with hbox
-        mainMenuScene = new Scene(vbox, 540, 200);
-
-        // Set the stage
-        primaryStage.setTitle("Game Manager");
-        primaryStage.setScene(mainMenuScene);
-        primaryStage.centerOnScreen();
-        primaryStage.show();
+        showLoginScreen(primaryStage);
     }
 
-    private void showLoginForm(Stage stage) {
-        VBox vboxLogin = new VBox(10);
-        vboxLogin.setPadding(new Insets(2));
-        vboxLogin.setAlignment(Pos.CENTER);
+    String currentUsername = "";
 
-        // Add toolbar from toolbarUI
-        ToolBarUI toolbar = new ToolBarUI();
+    private void showLoginScreen(Stage stage) {
+        // Login form layout
+        VBox loginBox = new VBox(15);
+        loginBox.setPadding(new Insets(20));
+        loginBox.setAlignment(Pos.CENTER);
+        loginBox.setStyle("-fx-background-color: #1E1E2F;");
 
-        // Create stack pane for toolbar
-        StackPane toolbarContainer = new StackPane();
-        toolbarContainer.setStyle("-fx-background-color: #ECECEC; -fx-border-color: #DEDEDE; -fx-border-width: 2px; -fx-border-radius: 5;");
-        toolbarContainer.getChildren().addAll(toolbar);
+        // Title
+        Text titleText = new Text("Sunny Games");
+        titleText.setFont(Font.font("Arial", 30));
+        titleText.setFill(Color.WHITE);
 
-        // Getter for menuButton
-        toolbar.getMenuButton().setOnAction(e -> stage.setScene(mainMenuScene));
+        // Username and Password Fields
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Username");
+        usernameField.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white; -fx-prompt-text-fill: gray;");
 
-        // Username Label
-        Label usernameLabel = new Label("Enter Username:");
-        usernameLabel.setFont(new Font("Georgia", 20));
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white; -fx-prompt-text-fill: gray;");
 
-        // Username Textfield
-        TextField usernameTextField = new TextField();
-        usernameTextField.setPromptText("Enter username here");
+        // Buttons
+        Button signInButton = new Button("Sign In");
+        signInButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
+        signInButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            if (UserAccountManager.checkLoginInfo(username, password)) {
+                currentUsername = username;
+                showMainApp(stage); // Navigate to main UI after login
+            } else {
+                showAlert("Error", "Username or password is incorrect.");
+            }
+        });
 
-        // Password Label
-        Label passwordLabel = new Label("Enter Password:");
-        passwordLabel.setFont(new Font("Georgia", 20));
+        Button registerButton = new Button("Register");
+        registerButton.setStyle("-fx-background-color: #3E3E5E; -fx-text-fill: white;");
+        registerButton.setOnAction(e -> showAccountCreationForm(stage));
 
-        // Password Field (not TextField for security reasons)
-        PasswordField passwordTextField = new PasswordField();
-        passwordTextField.setPromptText("Enter password");
+        // Add event listeners for Enter key
+        usernameField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                passwordField.requestFocus(); // Move focus to passwordField
+            }
+        });
 
-        // Submit Button
-        Button submitButton = new Button("Login");
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                signInButton.fire(); // Trigger the Sign In button click
+            }
+        });
 
-        // Back Button with functionality to return to primary scene
-        Button backButton = new Button("Back");
-        backButton.setOnAction(e -> stage.setScene(mainMenuScene));  // Go back to the main screen
+        // Add components to the loginBox
+        loginBox.getChildren().addAll(titleText, usernameField, passwordField, signInButton, registerButton);
 
-        // Add all elements to vbox
-        vboxLogin.getChildren().addAll(toolbarContainer, usernameLabel, usernameTextField, passwordLabel, passwordTextField, submitButton, backButton);
-
-        // Create scene with vboxLogin as the root
-        Scene loginScene = new Scene(vboxLogin, 400, 255);
-
-        // Set stage with the login scene
-        stage.setScene(loginScene);
+        // Create and set the Scene
+        Scene scene = new Scene(loginBox, 400, 300);
+        stage.setTitle("Sunny Games Login");
+        stage.setScene(scene);
+        stage.show();
     }
 
-    private void showAccountForm(Stage stage) {
+    private void showAccountCreationForm(Stage stage) {
         VBox vboxAccount = new VBox(10);
-        vboxAccount.setPadding(new Insets(15));
-        vboxAccount.setAlignment(Pos.CENTER_LEFT);
+        vboxAccount.setPadding(new Insets(20));
+        vboxAccount.setAlignment(Pos.CENTER);
+        vboxAccount.setStyle("-fx-background-color: #1E1E2F;");
 
-        // Welcome Label
-        Label welcomeLabel = new Label("Create an Account");
-        welcomeLabel.setStyle("-fx-font-size: 40px;");
+        Text titleLabel = new Text("Create an Account");
+        titleLabel.setFont(Font.font("Arial", 20));
+        titleLabel.setFill(Color.WHITE);
 
-        // Username Label
-        Label usernameLabel = new Label("Enter Username:");
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter Username");
+        usernameField.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white; -fx-prompt-text-fill: gray;");
 
-        // Username Textfield
-        TextField usernameTextField = new TextField();
-        usernameTextField.setPromptText("Enter username here");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter Password");
+        passwordField.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white; -fx-prompt-text-fill: gray;");
 
-        // Password Label
-        Label passwordLabel = new Label("Enter Password:");
+        Button createButton = new Button("Create Account");
+        createButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
+        createButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            if (UserAccountManager.doesUsernameExist(username)) {
+                showAlert("Error", "Username already exists.");
+            } else if (username.isEmpty() || password.isEmpty()) {
+                showAlert("Error", "Please fill in both fields.");
+            } else if (username.contains(" ") || password.contains(" ")){
+                showAlert("Error", "Username and password cannot contain spaces.");
+            } else {
+                UserAccountManager.writeAccountFile(username, password);
+                showAlert("Account Created", "Your account has been created.");
+                showLoginScreen(stage);
+            }
+        });
 
-        // Password Field (not TextField for security reasons)
-        PasswordField passwordTextField = new PasswordField();
-        passwordTextField.setPromptText("Enter password");
+        // Add event listeners for Enter key
+        usernameField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                passwordField.requestFocus(); // Move focus to passwordField
+            }
+        });
 
-        // Submit Button
-        Button submitButton = new Button("Submit");
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                createButton.fire(); // Trigger the Sign In button click
+            }
+        });
 
-        // Back Button with functionality to return to primary scene
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> stage.setScene(mainMenuScene));  // Go back to the main screen
+        backButton.setStyle("-fx-background-color: #3E3E5E; -fx-text-fill: white;");
+        backButton.setOnAction(e -> showLoginScreen(stage));
 
-        VBox titleBox = new VBox(10);
-        titleBox.setAlignment(Pos.CENTER);
-        titleBox.getChildren().addAll(welcomeLabel);
+        vboxAccount.getChildren().addAll(titleLabel, usernameField, passwordField, createButton, backButton);
 
-        // Add all elements to vbox
-        vboxAccount.getChildren().addAll(titleBox, usernameLabel, usernameTextField, passwordLabel, passwordTextField, submitButton, backButton);
-
-        // Create scene with vboxLogin as the root
         Scene accountScene = new Scene(vboxAccount, 400, 300);
-
-        // Set stage with the login scene
         stage.setScene(accountScene);
+    }
+
+    public void showMainApp(Stage stage) {
+    // Main layout
+    BorderPane mainLayout = new BorderPane();
+    mainLayout.setStyle("-fx-background-color: #1E1E2F;");
+
+    // Toolbar (always visible)
+    ToolBarUI toolBarUI = new ToolBarUI();
+    toolBarUI.setStyle("-fx-background-color: #2C2C3E; -fx-padding: 10px;");
+    toolBarUI.getMenuButton().setOnAction(e -> showMainApp(stage)); // "Main Menu" button action
+
+    // Left side - Game options section (60% of the width)
+    VBox gameOptionsBox = new VBox(15);
+    gameOptionsBox.setPadding(new Insets(20));
+    gameOptionsBox.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+    gameOptionsBox.setAlignment(Pos.CENTER);
+
+    Text gameOptionsTitle = new Text("Select a Game");
+    gameOptionsTitle.setFont(Font.font("Arial", 18));
+    gameOptionsTitle.setFill(Color.WHITE);
+
+    // Game buttons and images
+    HBox gameButtonsBox = new HBox(20);
+    gameButtonsBox.setAlignment(Pos.CENTER);
+
+    Button blackjackButton = new Button("Play BlackJack");
+    blackjackButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
+    blackjackButton.setOnAction(e -> {
+        startBlackJackGame();
+        // Start Black Jack Game
+    }
+    );
+
+    Button snakeButton = new Button("Play Snake");
+    snakeButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
+    snakeButton.setOnAction(e -> {
+        startSnakeGame();
+        // Start Snake Game
+    });
+
+    // Images for games (replace with actual images)
+    ImageView blackjackImage = new ImageView(new Image("file:resources/blackjack_icon.png"));
+    blackjackImage.setFitHeight(100);
+    blackjackImage.setFitWidth(100);
+
+    ImageView snakeImage = new ImageView(new Image("file:resources/snake_icon.png"));
+    snakeImage.setFitHeight(100);
+    snakeImage.setFitWidth(100);
+
+    VBox blackjackBox = new VBox(10, blackjackButton, blackjackImage);
+    blackjackBox.setAlignment(Pos.CENTER);
+
+    VBox snakeBox = new VBox(10, snakeButton, snakeImage);
+    snakeBox.setAlignment(Pos.CENTER);
+
+    gameButtonsBox.getChildren().addAll(blackjackBox, snakeBox);
+
+    gameOptionsBox.getChildren().addAll(gameOptionsTitle, gameButtonsBox);
+
+    // Right side - High Scores section
+    VBox highScoresBox = new VBox(15);
+    highScoresBox.setPadding(new Insets(20));
+    highScoresBox.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+    highScoresBox.setAlignment(Pos.TOP_CENTER);
+
+    // Title for the high scores section
+    Text highScoresTitle = new Text("Top 5 High Scores");
+    highScoresTitle.setFont(Font.font("Arial", 24)); // Adjusted font size
+    highScoresTitle.setFill(Color.WHITE);
+
+    // Create a container for both leaderboards
+    HBox leaderboardsBox = new HBox(20);
+    leaderboardsBox.setAlignment(Pos.CENTER);
+
+    // Blackjack leaderboard
+    VBox blackjackScoresBox = new VBox(10);
+    blackjackScoresBox.setAlignment(Pos.TOP_CENTER);
+    Text blackjackTitle = new Text("BlackJack");
+    blackjackTitle.setFont(Font.font("Arial", 18));
+    blackjackTitle.setFill(Color.WHITE);
+
+    ListView<String> blackjackScoresList = new ListView<>();
+    fillHighScore(blackjackScoresList, "blackjack");
+    blackjackScoresList.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+
+    // Snake leaderboard
+    VBox snakeScoresBox = new VBox(10);
+    snakeScoresBox.setAlignment(Pos.TOP_CENTER);
+    Text snakeTitle = new Text("Snake");
+    snakeTitle.setFont(Font.font("Arial", 18));
+    snakeTitle.setFill(Color.WHITE);
+
+    ListView<String> snakeScoresList = new ListView<>();
+    fillHighScore(snakeScoresList, "snake");
+    snakeScoresList.setStyle("-fx-background-color: #2C2C3E; -fx-text-fill: white;");
+
+    // Add titles and lists to their respective boxes
+    blackjackScoresBox.getChildren().addAll(blackjackTitle, blackjackScoresList);
+    snakeScoresBox.getChildren().addAll(snakeTitle, snakeScoresList);
+
+    // Add both leaderboards to the container
+    leaderboardsBox.getChildren().addAll(blackjackScoresBox, snakeScoresBox);
+
+    // Add the title and leaderboard container to the highScoresBox
+    highScoresBox.getChildren().addAll(highScoresTitle, leaderboardsBox);
+
+    // Create a horizontal split layout with 60% for left side and 40% for right side
+    HBox contentLayout = new HBox(20);
+    contentLayout.setPadding(new Insets(20));
+    contentLayout.getChildren().addAll(gameOptionsBox, highScoresBox);
+    contentLayout.setStyle("-fx-background-color: #1E1E2F;");
+
+    // Set the toolbar and content layout in the main layout
+    mainLayout.setTop(toolBarUI);
+    mainLayout.setCenter(contentLayout);
+
+    // Set the widths of the sides: 60% for left side, 40% for right side
+    HBox.setHgrow(gameOptionsBox, Priority.ALWAYS);
+    gameOptionsBox.setMaxWidth(Double.MAX_VALUE);
+    highScoresBox.setMinWidth(200); // Set minimum width for the right section
+
+    // Create and set the scene
+    Scene mainScene = new Scene(mainLayout, 800, 600);
+    stage.setTitle("Sunny Games");
+    stage.setScene(mainScene);
+    stage.centerOnScreen(); // Ensure the stage is centered on the screen
+    stage.show();
+}
+
+    // Show alert with a given title and message
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void startBlackJackGame() {
+        SessionManager.getInstance().setCurrentUser(currentUsername);
+        BlackjackUI blackjackUI = new BlackjackUI();
+        blackjackUI.start(new Stage());
+    }
+
+    private void startSnakeGame() {
+        SessionManager.getInstance().setCurrentUser(currentUsername);
+        SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
+        snakeGameBoardTest.start(new Stage());
+    }
+
+    private void fillHighScore(ListView<String> scoresList, String gameName) {
+        List<String[]> fileScores = new ScoreTracker().readScoreFile();
+        List<String[]> gameScores = new ArrayList<>();
+        for (String[] score : fileScores) {
+            if(score[0].equalsIgnoreCase(gameName)) {
+                gameScores.add(score);
+            }
+        }
+
+        gameScores.sort((a, b) -> Integer.compare(Integer.parseInt(b[2]), Integer.parseInt(a[2])));
+
+        ObservableList<String> playerScores = FXCollections.observableArrayList();
+        
+        for (int i = 0; i < 5; i++) {
+            String[] score = gameScores.get(i);
+            String scoreEntry = (i + 1) + ". " + score[1] + " | Score: " + score[2];
+            playerScores.add(scoreEntry);
+        }
+        
+        scoresList.setItems(playerScores);
     }
 
     public static void main(String[] args) {

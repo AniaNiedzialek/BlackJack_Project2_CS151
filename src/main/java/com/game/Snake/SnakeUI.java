@@ -3,8 +3,12 @@ package com.game.Snake;
 import java.util.List;
 
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.effect.Glow;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -14,21 +18,54 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 
+/**
+ * The SnakeUI class handles all visual aspects of the Snake game including:
+ * - Snake rendering
+ * - Food rendering
+ * - Game over screen
+ * - Menu systems
+ * - Score display
+ * This class serves as the primary interface between game logic and visual representation.
+ */
 public class SnakeUI {
-    // Constants for cell size and styling
+    // Constants 
+    /* Size of each cell in the game grid */
     private static final double CELL_SIZE = 15;
-    private static final double SNAKE_WIDTH = CELL_SIZE; // Thickness of the snake
-    private double gradientOffset = 0; // Offset for moving gradient
+    /* Width of the snake body */
+    private static final double SNAKE_WIDTH = 15;
+    /* Used for gradient animations */
+    private double gradientOffset = 0;
 
+    /* Graphics context for drawing on the canvas */
     private final GraphicsContext gc;
+    /* Canvas where the game is rendered */
     private final Canvas canvas;
+    /* Reference to the snake entity for position data */
     private final SnakeEntity snake;
+    /* Reference to food item for position data */
     private final SnakeFoodItem foodItem;
+    /* Reference to the main game board */
     private final SnakeGameBoard gameBoard;
-    private int score = 0;
+    /* Regerence to the Score Manager */
+    private ScoreManager scoreManager;
 
-    /**
-     * Constructor to initialize the SnakeUI with necessary components.
+    // Menu Components
+    /* Container for game over menu elements */
+    private final VBox gameOverMenu;
+    /* Button to restart the game */
+    private final Button restartButton;
+    /* Button to return to main menu */
+    private final Button mainMenuButton;
+
+    /*
+     * Constructs the SnakeUI with all necessary components for game rendering.
+     * Initializes the UI elements including buttons and menus.
+     *
+     * @param gc The graphics context for drawing
+     * @param canvas The canvas to draw on
+     * @param snake The snake entity
+     * @param foodItem The food item
+     * @param gameBoard The main game board
      */
     public SnakeUI(GraphicsContext gc, Canvas canvas, SnakeEntity snake, 
                    SnakeFoodItem foodItem, SnakeGameBoard gameBoard) {
@@ -37,158 +74,281 @@ public class SnakeUI {
         this.snake = snake;
         this.foodItem = foodItem;
         this.gameBoard = gameBoard;
+        this.scoreManager = new ScoreManager(gc, canvas.getWidth(), canvas.getHeight());
+
+        // Initialize UI components
+        this.restartButton = createStyledButton("Restart Game");
+        this.mainMenuButton = createStyledButton("Main Menu");
+        
+        // Set up game over menu
+        this.gameOverMenu = new VBox(20);
+        this.gameOverMenu.setAlignment(Pos.CENTER);
+        this.gameOverMenu.getChildren().addAll(restartButton, mainMenuButton);
+        this.gameOverMenu.setVisible(false);
 
         configureGraphicsContext();
-
-        // Set the UI reference back to the snake
         if (snake != null) {
             snake.setSnakeUI(this);
         }
     }
+
+    /*
+     * Creates a styled button with consistent appearance and hover effects.
+     * 
+     * @param text The button label
+     * @return A styled Button instance
+     */
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        
+        // Define base button style
+        String buttonStyle = "-fx-background-color: #1a472a; " +
+                            "-fx-text-fill: #98ff98; " +
+                            "-fx-font-size: 16px; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-min-width: 200px; " +
+                            "-fx-min-height: 45px; " +
+                            "-fx-background-radius: 5; " +
+                            "-fx-border-radius: 5; " +
+                            "-fx-border-color: #2ecc71; " +
+                            "-fx-border-width: 2; " +
+                            "-fx-cursor: hand;";
+        
+        // Define hover effect style
+        String hoverStyle = "-fx-background-color: #2ecc71; " +
+                           "-fx-text-fill: #ffffff; " +
+                           "-fx-font-size: 16px; " +
+                           "-fx-font-weight: bold; " +
+                           "-fx-min-width: 200px; " +
+                           "-fx-min-height: 45px; " +
+                           "-fx-background-radius: 5; " +
+                           "-fx-border-radius: 5; " +
+                           "-fx-border-color: #1a472a; " +
+                           "-fx-border-width: 2; " +
+                           "-fx-cursor: hand;";
+        
+        // Apply styles and hover effects
+        button.setStyle(buttonStyle);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(buttonStyle));
+        
+        return button;
+    }
+
+    /*
+     * Common helper method to draw end game screen (win or game over)
+     */
+    private void drawEndGameScreen(String mainText, Color mainColor, String scoreText) {
+        // Show final game state
+        drawSnake();
+        
+        // Add darkening overlay
+        gc.setFill(new Color(0, 0, 0, 0.65));
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // Draw main text
+        gc.setFill(mainColor);
+        gc.setFont(new Font("Arial Bold", 48));
+        gc.setEffect(new Glow(0.8));
+        gc.fillText(mainText, canvas.getWidth() / 2 - calculateTextOffset(mainText), canvas.getHeight() / 4);
+        
+        // Draw score
+        gc.setFill(Color.LIMEGREEN);
+        gc.setFont(new Font("Arial", 36));
+        gc.setEffect(new Glow(0.6));
+        gc.fillText(scoreText + getScore(), canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
+        gc.setEffect(null);
     
-    /*
-     * Increments score when eating food
-     */
-    public void incrementScore() {
-        score++;
+        showEndGameMenu();
     }
 
     /*
-     * Reset score when game is over
+     * Helper method to calculate text offset for centering
      */
-    public void resetScore() {
-        score = 0;
+    private double calculateTextOffset(String text) {
+        return text.length() * 17; // Approximate width per character
     }
 
     /*
-     * Makes the snake rounded instead of rectangular
+     * Helper method to show and position the menu
      */
-    private void configureGraphicsContext() {
-        if (gc != null) {
-            gc.setLineCap(StrokeLineCap.ROUND);
+    private void showEndGameMenu() {
+        gameOverMenu.setLayoutX((canvas.getWidth() - 100) / 2);
+        gameOverMenu.setLayoutY(canvas.getHeight() / 1.5);
+        gameOverMenu.setVisible(true);
+        
+        if (!gameBoard.getChildren().contains(gameOverMenu)) {
+            gameBoard.getChildren().add(gameOverMenu);
         }
-        gc.setLineCap(StrokeLineCap.ROUND);
-        gc.setLineJoin(StrokeLineJoin.ROUND);
     }
 
-    /**
-     * Main method to draw the snake, food, and game border on the canvas.
+    /*
+     * Draw game over screen using helper method
+     */
+    public void drawGameOver() {
+        drawEndGameScreen("GAME OVER", Color.RED, "Score: ");
+    }
+
+    /*
+     * Draw win screen using helper method
+     */
+    public void drawWinScreen() {
+        drawEndGameScreen("YOU WIN!", Color.GOLD, "Final Score: ");
+    }
+
+    /*
+     * Main render method for the game state.
+     * Draws the snake, food, and border in their current positions.
      */
     public void drawSnake() {
-        // Clear canvas and draw game boundary
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gameBoard.drawBorder();
 
-        // Draw food if available
+        // Drawing the score while drawing the snake
+        scoreManager.drawScore();
+
+        // Draw food if it exists
         if (foodItem != null && foodItem.getPosition() != null) {
             drawFood(foodItem.getPosition());
         }
 
-        // Draw snake
+        // Draw snake if it exists
         List<Point2D> segments = snake.getSegmenets();
         if (!segments.isEmpty()) {
-            drawSnakeBody(segments); // Draw connected body with nebula gradient
-            drawSnakeHead(segments.get(0)); // Draw distinct head
+            drawSnakeBody(segments);
+            drawSnakeHead(segments.get(0));
         }
 
-        // Update gradient offset for next frame to simulate movement
-        gradientOffset += 0.01; // Adjust this value for faster or slower movement
-        if (gradientOffset > 1) gradientOffset = 0; // Loop the gradient offset
+        // Update gradient animation
+        gradientOffset = (gradientOffset + 0.01) % 1;
     }
 
-    /**
-     * Draws the snake's body with a dynamic nebula-like gradient.
+    /*
+     * Renders the snake's body with a gradient effect.
      * 
-     * @param segments List of Point2D positions representing the body segments.
+     * @param segments List of points representing snake segments
      */
     private void drawSnakeBody(List<Point2D> segments) {
-        // Static gradient with green shades
+        // Create gradient effect for snake body
         LinearGradient gradient = new LinearGradient(
             0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.LIMEGREEN),   // Start color
-            new Stop(1, Color.DARKGREEN)   // End color
+            new Stop(0, Color.web("#00ff87")), // Bright mint green
+            new Stop(1, Color.web("#00cc69"))  // Slightly darker mint
         );
-    
-        gc.setStroke(gradient); // Apply gradient as stroke
-        gc.setLineWidth(SNAKE_WIDTH); // Thickness of the body
-    
-        // Draw the connected snake body as a path
+        
+        gc.setStroke(gradient);
+        gc.setLineWidth(SNAKE_WIDTH);
+        
+        // Draw connected snake segments
         gc.beginPath();
         Point2D start = segments.get(0).multiply(CELL_SIZE);
-        gc.moveTo(start.getX() + CELL_SIZE / 2, start.getY() + CELL_SIZE / 2); // Center alignment        
-    
+        gc.moveTo(start.getX() + CELL_SIZE / 2, start.getY() + CELL_SIZE / 2);
+        
         for (int i = 1; i < segments.size(); i++) {
             Point2D segment = segments.get(i).multiply(CELL_SIZE);
             gc.lineTo(segment.getX() + CELL_SIZE / 2, segment.getY() + CELL_SIZE / 2);
         }
-    
+        
         gc.stroke();
     }
-    
-    /**
-    * Draws the snake's head with a distinct gradient to match the nebula theme.
+
+    /*
+     * Renders the snake's head with a distinct appearance.
      * 
-     * @param headPos Position of the snake's head.
+     * @param headPos Position of the snake's head
      */
     private void drawSnakeHead(Point2D headPos) {
         double x = headPos.getX() * CELL_SIZE + CELL_SIZE / 2;
         double y = headPos.getY() * CELL_SIZE + CELL_SIZE / 2;
-    
-        // Draw a dark green border (outline) for the head
-        gc.setFill(Color.DARKGREEN);
-        gc.fillOval(x - SNAKE_WIDTH / 2 - 1, y - SNAKE_WIDTH / 2 - 1, SNAKE_WIDTH + 2, SNAKE_WIDTH + 2);
-    
-        // Fill the head with lime green
-        gc.setFill(Color.LIMEGREEN);
-        gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
-    }
         
+        // Draw head outline with glow
+        gc.setFill(Color.web("#00cc69"));
+        gc.fillOval(x - SNAKE_WIDTH / 2 - 1, y - SNAKE_WIDTH / 2 - 1, SNAKE_WIDTH + 2, SNAKE_WIDTH + 2);
+        
+        // Draw head interior with brighter color
+        gc.setFill(Color.web("#50ff1c"));
+        gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
 
-    /**
-     * Draws the food on the canvas.
+        // Add glow effect
+        Glow glow = new Glow(0.5);
+        gc.setEffect(glow);
+        gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
+        gc.setEffect(null);
+    }
+
+    /*
+     * Renders the food item with a glowing effect.
      * 
-     * @param foodPos Position of the food.
+     * @param foodPos Position of the food item
      */
     private void drawFood(Point2D foodPos) {
         double x = foodPos.getX() * CELL_SIZE;
         double y = foodPos.getY() * CELL_SIZE;
-
-        // Create a radial gradient for glowing food
+        
+        // Create glowing gradient effect for food
         RadialGradient gradient = new RadialGradient(
-        0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
-        false, CycleMethod.NO_CYCLE,
-        new Stop(0, Color.YELLOW),   // Center color
-        new Stop(1, Color.RED)       // Outer color
-    );
+            0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
+            false, CycleMethod.NO_CYCLE,
+            new Stop(0, Color.web("#00FFFF")), // Bright cyan
+            new Stop(1, Color.web("#0099FF"))  // Sky blue
+        );
+        
+        gc.setFill(gradient);
+        gc.fillOval(x, y, CELL_SIZE, CELL_SIZE);
+    }
 
-    gc.setFill(gradient); // Apply gradient as fill
-    gc.fillOval(x, y, CELL_SIZE, CELL_SIZE); // Draw the food
-}
+    /*
+     * Configures the graphics context for smooth rendering.
+     */
+    private void configureGraphicsContext() {
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.setLineJoin(StrokeLineJoin.ROUND);
+    }
+
+    // Utility Methods
 
     /**
-     * Displays the "Game Over" message on the canvas.
+     * Hides and removes the game over menu from display.
      */
-    public void drawGameOver() {
-        // Clear the canvas first
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gameBoard.drawBorder();
+    public void hideGameOverMenu() {
+        gameOverMenu.setVisible(false);
+        gameBoard.getChildren().remove(gameOverMenu);
+        gameBoard.requestFocus();
+    }
 
-        // Draw game over
-        gc.setFill(Color.RED);
-        gc.setFont(new Font("Arial Bold", 48)); // Font styling
+    /*
+     * Increments the game score.
+     */
+    public void incrementScore() {
+        scoreManager.incrementScore();
 
-        // Draw glowing effect
-        gc.setEffect(new javafx.scene.effect.Glow(0.8));
-        gc.fillText("GAME OVER", canvas.getWidth() / 2 - 150, canvas.getHeight() / 2 - 50);
-    
-        // Reset the effect to avoid applying to other drawings
-        gc.setEffect(null);
-            
-        // Draw score
-        gc.setFill(Color.LIMEGREEN);
-        gc.setFont(new Font("Arial", 30));
-        gc.setEffect(new javafx.scene.effect.Glow(0.6));
-        gc.fillText("Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2 - 5);
-        gc.setEffect(null);
+    }
+
+    /*
+     * Resets the game score to zero.
+     */
+    public void resetScore() {
+        scoreManager.resetScore();
+    }
+
+    /*
+     * Get score
+     */
+    public int getScore() {
+        return scoreManager.getCurrentScore();
+    }
+
+    /*
+     * @return The restart game button
+     */
+    public Button getRestartButton() {
+        return restartButton;
+    }
+
+    /*
+     * @return The main menu button
+     */
+    public Button getMainMenuButton() {
+        return mainMenuButton;
     }
 }
