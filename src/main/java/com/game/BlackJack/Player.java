@@ -2,18 +2,16 @@ package com.game.BlackJack;
 
 import java.util.ArrayList;
 
-public class Player {
+public abstract class Player {
     private String name;
     private ArrayList<Card> hand;
     private int balance;
     private int bet;
-    private boolean isHuman;
 
-    public Player(String name, int balance, boolean isHuman) {
+    public Player(String name, int balance) {
         this.name = name;
         this.balance = balance;
-        this.isHuman = isHuman;
-        hand = new ArrayList<>();
+        this.hand = new ArrayList<>();
     }
 
     public void addCard(Card card) {
@@ -49,6 +47,10 @@ public class Player {
         return hand;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public int getBalance() {
         return balance;
     }
@@ -57,20 +59,13 @@ public class Player {
         balance += amount;
     }
 
-    public int getBet() {
-        return bet;
-    }
+    public abstract void takeTurn(GameController gameController);
 
     public void setBet(int bet) {
         this.bet = bet;
     }
 
-    public boolean isHuman() {
-        return isHuman;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    public int getBet() {
+        return bet;
     }
 }
