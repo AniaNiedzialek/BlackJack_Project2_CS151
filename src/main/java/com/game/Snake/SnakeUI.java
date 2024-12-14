@@ -155,9 +155,18 @@ public class SnakeUI {
         gc.setFill(Color.LIMEGREEN);
         gc.setFont(new Font("Arial", 36));
         gc.setEffect(new Glow(0.6));
-        gc.fillText(scoreText + getScore(), canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
-        gc.setEffect(null);
+       
+        // Create the complete score text
+        String fullScoreText = scoreText + getScore();
+        // Calculate score text width
+        double scoreTextWidth = fullScoreText.length() * 17;
     
+        // Center the score text
+        gc.fillText(fullScoreText, 
+                canvas.getWidth() / 2 - scoreTextWidth / 2,  // Center horizontally
+                canvas.getHeight() / 2.8);
+        gc.setEffect(null);
+
         showEndGameMenu();
     }
 
