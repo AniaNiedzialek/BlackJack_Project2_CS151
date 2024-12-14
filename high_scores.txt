@@ -7,15 +7,4 @@ snake default 0
 snake default 0
 snake default 0
 snake default 0
-snake default 1000
-snake default 1000
-blackjack FlabbHs 2000
-blackjack Foxxie 3000
-snake Polar 4000
-blackjack Ry 2000
-snake Kiro 4000
-blackjack FlabbHs 123
-blackjack 123 1000
-snake 123 1000
-blackjack Mo 1000
-snake Mo 1000
+snake default 0
