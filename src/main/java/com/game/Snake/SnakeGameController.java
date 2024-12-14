@@ -166,7 +166,9 @@ public class SnakeGameController {
 
         if (snake.getHeadPosition().equals(foodItem.getPosition())) {
             snake.grow();
+            if (!snake.hasWon()) {  // Only spawn new food if game hasn't been won
             foodItem.spawnFood(snake.getSegmenets());
+            }
         }
     }
 
