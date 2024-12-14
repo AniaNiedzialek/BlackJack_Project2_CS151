@@ -36,7 +36,6 @@ public class SnakeUI {
     /* Used for gradient animations */
     private double gradientOffset = 0;
 
-    // Core Components
     /* Graphics context for drawing on the canvas */
     private final GraphicsContext gc;
     /* Canvas where the game is rendered */
@@ -47,8 +46,8 @@ public class SnakeUI {
     private final SnakeFoodItem foodItem;
     /* Reference to the main game board */
     private final SnakeGameBoard gameBoard;
-    /* Current game score */
-    private int score = 0;
+    /* Regerence to the Score Manager */
+    private ScoreManager scoreManager;
 
     // Menu Components
     /* Container for game over menu elements */
@@ -75,6 +74,7 @@ public class SnakeUI {
         this.snake = snake;
         this.foodItem = foodItem;
         this.gameBoard = gameBoard;
+        this.scoreManager = new ScoreManager(gc, canvas.getWidth(), canvas.getHeight());
 
         // Initialize UI components
         this.restartButton = createStyledButton("Restart Game");
@@ -156,7 +156,7 @@ public class SnakeUI {
         gc.setFill(Color.LIMEGREEN);
         gc.setFont(new Font("Arial", 36));
         gc.setEffect(new Glow(0.6));
-        gc.fillText(scoreText + score, canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
+        gc.fillText(scoreText + getScore(), canvas.getWidth() / 2 - 70, canvas.getHeight() / 2.8);
         gc.setEffect(null);
     
         showEndGameMenu();
@@ -203,6 +203,9 @@ public class SnakeUI {
     public void drawSnake() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gameBoard.drawBorder();
+
+        // Drawing the score while drawing the snake
+        scoreManager.drawScore();
 
         // Draw food if it exists
         if (foodItem != null && foodItem.getPosition() != null) {
@@ -317,14 +320,22 @@ public class SnakeUI {
      * Increments the game score.
      */
     public void incrementScore() {
-        score = score + 100;
+        scoreManager.incrementScore();
+
     }
 
     /*
      * Resets the game score to zero.
      */
     public void resetScore() {
-        score = 0;
+        scoreManager.resetScore();
+    }
+
+    /*
+     * Get score
+     */
+    public int getScore() {
+        return scoreManager.getCurrentScore();
     }
 
     /*
