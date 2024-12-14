@@ -233,21 +233,36 @@ public class BlackjackUI extends Application {
         gameController.nextTurn();
         processAITurns();
         updateTable();
+        createGameScene();
     }
 
     private void processAITurns() {
+        // Loop while the current player is not a HumanPlayer
         while (!(gameController.getCurrentPlayer() instanceof HumanPlayer)) {
             Player currentPlayer = gameController.getCurrentPlayer();
+    
+            // Check if the AI player should hit
             if (currentPlayer.getHand().size() < 5 && currentPlayer.calculateHandValue() < 16) {
                 currentPlayer.addCard(gameController.getDeck().dealCard());
+                System.out.println(currentPlayer.getName() + " hits.");
             } else {
+                // If not hitting, move to the next player
+                System.out.println(currentPlayer.getName() + " stands.");
+                gameController.nextTurn();
+            }
+    
+            // If the player is busted, log it and move to the next player
+            if (currentPlayer.isBusted()) {
+                System.out.println(currentPlayer.getName() + " is busted!");
                 gameController.nextTurn();
             }
         }
     }
+    
 
     private void updateTable() {
         playerBox.getChildren().clear();
+
         dealerBox.getChildren().clear();
         aiPlayer1Box.getChildren().clear();
         aiPlayer2Box.getChildren().clear();
