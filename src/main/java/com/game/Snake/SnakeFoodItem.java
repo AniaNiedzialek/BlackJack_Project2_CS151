@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Random;
 
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 
 /*
  * Represents a food item in the Snake game, which the snake consumes to grow and score
@@ -15,11 +20,37 @@ public class SnakeFoodItem {
     private Random random = new Random();
     private int gridColumns;
     private int gridRows;
+    private static final int CELL_SIZE = 15; 
+    private final GraphicsContext gc;     
 
     // Constructor accepting grid dimensions
-    public SnakeFoodItem(int gridColumns, int gridRows) {
+    public SnakeFoodItem(int gridColumns, int gridRows, GraphicsContext gc) {
         this.gridColumns = gridColumns;
         this.gridRows = gridRows;
+        this.gc = gc;
+    }
+
+    /*
+     * Renders the food item with a glowing effect.
+     * 
+     * @param foodPos Position of the food item
+     */
+    public void drawFood() {
+        if (position == null) return;
+        
+        double x = position.getX() * CELL_SIZE;
+        double y = position.getY() * CELL_SIZE;
+        
+        // Create glowing gradient effect for food
+        RadialGradient gradient = new RadialGradient(
+            0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
+            false, CycleMethod.NO_CYCLE,
+            new Stop(0, Color.web("#00FFFF")), // Bright cyan
+            new Stop(1, Color.web("#0099FF"))  // Sky blue
+        );
+        
+        gc.setFill(gradient);
+        gc.fillOval(x, y, CELL_SIZE, CELL_SIZE);
     }
 
     public void spawnFood(List<Point2D> snakeSegments) {
@@ -37,7 +68,6 @@ public class SnakeFoodItem {
         position = newPosition; // Set the position once it's valid
     }
     
-
     // Getter for position
     public Point2D getPosition() {
         return position;
