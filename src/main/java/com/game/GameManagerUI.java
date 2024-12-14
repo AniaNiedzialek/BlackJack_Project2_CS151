@@ -2,7 +2,6 @@ package com.game;
 
 import com.game.BlackJack.BlackjackUI;
 import com.game.Snake.SnakeGameBoardTest;
-import com.game.Snake.SnakeGameController;
 
 /*
  * Manages the main functionality of the game application, including user login,
@@ -38,6 +37,8 @@ public class GameManagerUI extends Application {
         showLoginScreen(primaryStage);
     }
 
+    String currentUsername = "";
+
     private void showLoginScreen(Stage stage) {
         // Login form layout
         VBox loginBox = new VBox(15);
@@ -66,6 +67,7 @@ public class GameManagerUI extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
             if (UserAccountManager.checkLoginInfo(username, password)) {
+                currentUsername = username;
                 showMainApp(stage); // Navigate to main UI after login
             } else {
                 showAlert("Error", "Username or password is incorrect.");
@@ -296,12 +298,13 @@ public class GameManagerUI extends Application {
     }
 
     private void startBlackJackGame() {
+        SessionManager.getInstance().setCurrentUser(currentUsername);
         BlackjackUI blackjackUI = new BlackjackUI();
         blackjackUI.start(new Stage());
     }
 
     private void startSnakeGame() {
-        ScoreTracker.writeScoreFile("FlabbHS", "BlackJack" , "123");
+        SessionManager.getInstance().setCurrentUser(currentUsername);
         SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
         snakeGameBoardTest.start(new Stage());
     }
@@ -314,11 +317,17 @@ public class GameManagerUI extends Application {
                 gameScores.add(score);
             }
         }
+
+        gameScores.sort((a, b) -> Integer.compare(Integer.parseInt(b[2]), Integer.parseInt(a[2])));
+
         ObservableList<String> playerScores = FXCollections.observableArrayList();
-        for (String[] score : gameScores) {
-            String scoreEntry = score[1] + " | Score: " + score[2];
+        
+        for (int i = 0; i < 5; i++) {
+            String[] score = gameScores.get(i);
+            String scoreEntry = (i + 1) + ". " + score[1] + " | Score: " + score[2];
             playerScores.add(scoreEntry);
         }
+        
         scoresList.setItems(playerScores);
     }
 
