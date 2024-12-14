@@ -1,5 +1,7 @@
 package com.game.Snake;
 
+import com.game.SessionManager;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Glow;
 import javafx.scene.paint.Color;
@@ -99,6 +101,7 @@ public class ScoreManager {
         currentScore += 1000;
         if (currentScore > highScore) {
             highScore = currentScore;
+            SessionManager.getInstance().setCurrentScore(String.valueOf(currentScore));
         }
     }
 
