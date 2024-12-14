@@ -12,7 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
@@ -46,7 +45,7 @@ public class SnakeUI {
     private final SnakeFoodItem foodItem;
     /* Reference to the main game board */
     private final SnakeGameBoard gameBoard;
-    /* Regerence to the Score Manager */
+    /* Reference to the Score Manager */
     private ScoreManager scoreManager;
 
     // Menu Components
@@ -208,8 +207,8 @@ public class SnakeUI {
         scoreManager.drawScore();
 
         // Draw food if it exists
-        if (foodItem != null && foodItem.getPosition() != null) {
-            drawFood(foodItem.getPosition());
+        if (foodItem != null) {
+            foodItem.drawFood();
         }
 
         // Draw snake if it exists
@@ -274,27 +273,6 @@ public class SnakeUI {
         gc.setEffect(glow);
         gc.fillOval(x - SNAKE_WIDTH / 2, y - SNAKE_WIDTH / 2, SNAKE_WIDTH, SNAKE_WIDTH);
         gc.setEffect(null);
-    }
-
-    /*
-     * Renders the food item with a glowing effect.
-     * 
-     * @param foodPos Position of the food item
-     */
-    private void drawFood(Point2D foodPos) {
-        double x = foodPos.getX() * CELL_SIZE;
-        double y = foodPos.getY() * CELL_SIZE;
-        
-        // Create glowing gradient effect for food
-        RadialGradient gradient = new RadialGradient(
-            0, 0, x + CELL_SIZE / 2, y + CELL_SIZE / 2, CELL_SIZE / 2,
-            false, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#00FFFF")), // Bright cyan
-            new Stop(1, Color.web("#0099FF"))  // Sky blue
-        );
-        
-        gc.setFill(gradient);
-        gc.fillOval(x, y, CELL_SIZE, CELL_SIZE);
     }
 
     /*

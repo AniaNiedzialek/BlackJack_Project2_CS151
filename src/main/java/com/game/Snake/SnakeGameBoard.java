@@ -47,7 +47,7 @@ public class SnakeGameBoard extends StackPane {
         
         // Create game entities
         SnakeEntity snake = new SnakeEntity(this, gridColumns, gridRows);
-        SnakeFoodItem foodItem = new SnakeFoodItem(gridColumns, gridRows);
+        SnakeFoodItem foodItem = new SnakeFoodItem(gridColumns, gridRows, gc);
 
         // Create UI and controller with proper references
         snakeUI = new SnakeUI(gc, canvas, snake, foodItem, this);
