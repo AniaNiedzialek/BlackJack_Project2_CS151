@@ -25,6 +25,8 @@ public class SnakeEntity {
     private int growthPending;
     private final int gridColumns;
     private final int gridRows;
+    private final int maxPossibleLength;
+    private boolean hasWon = false;
     
     /*
      * Creates a new snake entity with specified grid dimensions.
@@ -37,6 +39,7 @@ public class SnakeEntity {
         this.gameBoard = gameBoard;
         this.gridColumns = gridColumns;
         this.gridRows = gridRows;
+        this.maxPossibleLength = (gridColumns - 2) * (gridRows - 2);
     }
 
     /*
@@ -97,6 +100,11 @@ public class SnakeEntity {
     public void grow() {
         growthPending++;
         snakeUI.incrementScore();
+
+        // Check if snake has reached maximum possible length
+        if (segments.size() + growthPending >= maxPossibleLength) {
+            hasWon = true;
+        }
     }
 
     /*
@@ -120,6 +128,13 @@ public class SnakeEntity {
         double x = head.getX();
         double y = head.getY();
         return x <= 0 || x >= gridColumns - 1 || y <= 0 || y >= gridRows - 1;
+    }
+
+    /*
+     * Boolean method to check if the plaer has won 
+     */
+    public boolean hasWon() {
+        return hasWon;
     }
 
     /*

@@ -1,10 +1,7 @@
+blackjack FlabbHs 1000
+blackjack Foxxie 800
+snake Polar 1000
+blackjack Ry 2000
+snake Kiro 4000
 blackjack default 0
-blackjack default 0
-blackjack default 0
-blackjack default 0
-blackjack default 0
-snake default 0
-snake default 0
-snake default 0
-snake default 0
 snake default 0
