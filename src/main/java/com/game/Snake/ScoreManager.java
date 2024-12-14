@@ -93,10 +93,10 @@ public class ScoreManager {
     }
 
     /*
-     * Increment score by 100 for each food eater
+     * Increment score by 1000 for each food eater
      */
     public void incrementScore() {
-        currentScore += 100;
+        currentScore += 1000;
         if (currentScore > highScore) {
             highScore = currentScore;
         }
