@@ -8,3 +8,6 @@ snake default 1000
 snake default 1000
 snake default 1000
 snake default 1000
+
+snake 123 2000
+snake 123 3000

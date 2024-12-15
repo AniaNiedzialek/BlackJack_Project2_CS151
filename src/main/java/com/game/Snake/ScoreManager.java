@@ -101,7 +101,7 @@ public class ScoreManager {
         currentScore += 1000;
         if (currentScore > highScore) {
             highScore = currentScore;
-            SessionManager.getInstance().setCurrentScore(String.valueOf(currentScore));
+            SessionManager.getInstance().setCurrentScore(String.valueOf(highScore));
         }
     }
 
