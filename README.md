@@ -63,9 +63,10 @@ players win.
 - **Card**: Models a playing card with attributes such as rank, suit, and value, and includes functionality for representing card details.
 - **Dealer**: Implements the dealer's behavior, including hitting until reaching a hand value of at least 17, as per Blackjack rules.
 - **Deck**:  Manages the deck of cards, including shuffling, dealing cards, and keeping track of remaining cards.
-- **GameController**: Handles the core game logic, including managing turns, player actions, betting, and determining the winner at the end of each round.
+- **BlackjackGameController**: Handles the core game logic, including managing turns, player actions, betting, and determining the winner at the end of each round.
 - **HumanPlayer**: Represents the human player, allowing manual actions such as hitting and standing, and managing their bet and balance.
 - **Player**: Serves as the abstract base class for all players (human, AI, dealer), providing common attributes and behaviors like hand management and balance tracking.
+  
 ---
 ### Snake
 The game allows to grow the snake until the game ends. 
