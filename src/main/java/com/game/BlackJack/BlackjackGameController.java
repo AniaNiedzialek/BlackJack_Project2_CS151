@@ -1,15 +1,14 @@
-
 package com.game.BlackJack;
 
 import java.util.ArrayList;
 
-public class GameController {
+public class BlackjackGameController {
     private Deck deck;
     private ArrayList<Player> players;
     private Dealer dealer;
     private int currentPlayerIndex;
 
-    public GameController() {
+    public BlackjackGameController() {
         // Initialize the deck and shuffle
         deck = new Deck();
         deck.shuffle();
@@ -27,17 +26,30 @@ public class GameController {
         currentPlayerIndex = 0;
     }
 
+    public void initializeBets() {
+        for (Player player : players) {
+            if (player instanceof AIPlayer) {
+                // AI players place a default bet
+                ((AIPlayer) player).placeBet(10); // Example: AI always bets $10
+            }
+        }
+    }
+    
+
     /**
      * Starts a new round by clearing hands, dealing cards, and resetting the turn index.
      */
     public void startRound() {
-        // Clear all hands
+        // Clear hands and reset bets
         for (Player player : players) {
             player.clearHand();
         }
         dealer.clearHand();
 
-        // Deal two cards to each player and the dealer
+        // Initialize deck and deal cards
+        deck = new Deck();
+        deck.shuffle();
+
         for (Player player : players) {
             player.addCard(deck.dealCard());
             player.addCard(deck.dealCard());
@@ -45,68 +57,79 @@ public class GameController {
         dealer.addCard(deck.dealCard());
         dealer.addCard(deck.dealCard());
 
-        // Reset the turn to the first player
         currentPlayerIndex = 0;
     }
 
-    /**
-     * Gets the current player whose turn it is.
-     * 
-     * @return The current player.
-     */
     public Player getCurrentPlayer() {
+        if (currentPlayerIndex >= players.size()) {
+            throw new IllegalStateException("No current player: all turns are completed.");
+        }
         return players.get(currentPlayerIndex);
     }
 
-    /**
-     * Advances the turn to the next player.
-     */
     public void nextTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        currentPlayerIndex++;
+
+        if (currentPlayerIndex >= players.size()) {
+            System.out.println("All players have completed their turns. Dealer's turn begins.");
+            return;
+        }
+
+        Player currentPlayer = players.get(currentPlayerIndex);
+
+        // Threaded delay for AI Players
+        if (currentPlayer instanceof AIPlayer) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1500); // 1.5-second delay
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Next Turn - Current Player: " + currentPlayer.getName());
+            }).start();
+        } else {
+            System.out.println("Next Turn - Current Player: " + currentPlayer.getName());
+        }
     }
 
-    /**
-     * Checks if the round is over (all players have taken their turns).
-     * 
-     * @return True if the round is over, false otherwise.
-     */
+    public void setCurrentPlayerIndex(int index) {
+        currentPlayerIndex = index;
+    }
+
     public boolean isRoundOver() {
-        return currentPlayerIndex == players.size();
+        return currentPlayerIndex >= players.size();
     }
 
-    /**
-     * Dealer plays its turn following the rules (hit on 17 or less).
-     */
     public void dealerPlay() {
+        System.out.println("Dealer's turn begins.");
         dealer.takeTurn(this);
     }
 
-    /**
-     * Resolves the round by determining winners and losers and updating balances.
-     * 
-     * @return The results of the round.
-     */
     public ArrayList<String> resolveRound() {
         ArrayList<String> results = new ArrayList<>();
         int dealerValue = dealer.calculateHandValue();
         boolean dealerBusted = dealer.isBusted();
-
+    
         for (Player player : players) {
             int playerValue = player.calculateHandValue();
-
             if (player.isBusted()) {
                 results.add(player.getName() + " busted and lost their bet.");
+                player.loseBet();
             } else if (dealerBusted || playerValue > dealerValue) {
                 results.add(player.getName() + " wins!");
+                player.winBet();
             } else if (playerValue == dealerValue) {
                 results.add(player.getName() + " ties with the dealer.");
+                player.tieBet();
             } else {
                 results.add(player.getName() + " loses.");
+                player.loseBet();
             }
         }
-
+    
         return results;
-    }
+    }    
+    
 
     public Deck getDeck() {
         return deck;
@@ -114,6 +137,10 @@ public class GameController {
 
     public Dealer getDealer() {
         return dealer;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
     }
 
     private int getCardValue(String rank) {
@@ -130,7 +157,7 @@ public class GameController {
             case "Jack": return 10;
             case "Queen": return 10;
             case "King": return 10;
-            case "Ace": return 11; // Can be adjusted for Ace's dual value
+            case "Ace": return 11;
             default: throw new IllegalArgumentException("Unknown rank: " + rank);
         }
     }
@@ -138,35 +165,33 @@ public class GameController {
     public int calculateHandValue(Player player) {
         int value = 0;
         int aces = 0;
-    
+
         for (Card card : player.getHand()) {
             value += getCardValue(card.getRank());
             if (card.getRank().equals("Ace")) aces++;
         }
-    
+
         while (value > 21 && aces > 0) {
             value -= 10;
             aces--;
         }
-    
+
         return value;
     }
 
     public HumanPlayer getHumanPlayer() {
-        return (HumanPlayer) players.get(0); // Assuming the first player is always the human player
+        return (HumanPlayer) players.get(0);
     }
-    
+
     public AIPlayer getAIPlayer1() {
-        return (AIPlayer) players.get(1); // Assuming the second player is AI Player 1
+        return (AIPlayer) players.get(1);
     }
-    
+
     public AIPlayer getAIPlayer2() {
-        return (AIPlayer) players.get(2); // Assuming the third player is AI Player 2
+        return (AIPlayer) players.get(2);
     }
 
     public ArrayList<Player> getPlayers() {
-        return players; // Assuming `players` is the ArrayList<Player> storing all players.
+        return players;
     }
-    
-    
 }

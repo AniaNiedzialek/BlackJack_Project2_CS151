@@ -6,9 +6,16 @@ public class AIPlayer extends Player {
     }
 
     @Override
-    public void takeTurn(GameController gameController) {
-        while (calculateHandValue() < 16) {
+    public void takeTurn(BlackjackGameController gameController) {
+        if (isBusted()) return;
+    
+        int dealerUpCardValue = gameController.getDealer().getHand().get(0).getValue();
+        while (calculateHandValue() < 16 || (calculateHandValue() < 18 && dealerUpCardValue >= 7)) {
             addCard(gameController.getDeck().dealCard());
+            System.out.println(getName() + " hits.");
+            if (isBusted()) return;
         }
-    }
+    
+        System.out.println(getName() + " stands.");
+    }      
 }

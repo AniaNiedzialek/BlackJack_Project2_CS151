@@ -8,12 +8,38 @@ public abstract class Player {
     private int balance;
     private int bet;
 
-    public Player(String name, int balance) {
+    public Player(String name, int initialBalance) {
         this.name = name;
-        this.balance = balance;
+        this.balance = initialBalance;
         this.hand = new ArrayList<>();
+        this.bet = 0;
     }
 
+    // Methods for betting
+    public void placeBet(int betAmount) {
+        if (betAmount <= balance) {
+            this.bet = betAmount;
+            this.balance -= betAmount;
+        } else {
+            throw new IllegalArgumentException(name + " has insufficient balance to place this bet!");
+        }
+    }
+
+    public void winBet() {
+        this.balance += this.bet * 2; // Winner gets 2x their bet
+        this.bet = 0; // Reset bet after winning
+    }
+
+    public void loseBet() {
+        this.bet = 0; // Reset bet after losing
+    }
+
+    public void tieBet() {
+        this.balance += this.bet; // Return the bet on a tie
+        this.bet = 0; // Reset bet after tie
+    }
+
+    // Methods for managing the player's hand
     public void addCard(Card card) {
         hand.add(card);
     }
@@ -28,9 +54,12 @@ public abstract class Player {
 
         for (Card card : hand) {
             value += card.getValue();
-            if (card.getRank().equals("Ace")) aces++;
+            if (card.getRank().equals("Ace")) {
+                aces++;
+            }
         }
 
+        // Adjust for aces (Ace = 1 if value > 21)
         while (value > 21 && aces > 0) {
             value -= 10;
             aces--;
@@ -43,6 +72,7 @@ public abstract class Player {
         return calculateHandValue() > 21;
     }
 
+    // Getters and setters
     public ArrayList<Card> getHand() {
         return hand;
     }
@@ -59,8 +89,6 @@ public abstract class Player {
         balance += amount;
     }
 
-    public abstract void takeTurn(GameController gameController);
-
     public void setBet(int bet) {
         this.bet = bet;
     }
@@ -68,4 +96,7 @@ public abstract class Player {
     public int getBet() {
         return bet;
     }
+
+    // Abstract method for the player's turn
+    public abstract void takeTurn(BlackjackGameController gameController);
 }

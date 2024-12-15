@@ -6,7 +6,7 @@ public class Dealer extends Player {
     }
 
     @Override
-    public void takeTurn(GameController gameController) {
+    public void takeTurn(BlackjackGameController gameController) {
         while (calculateHandValue() < 17) {
             addCard(gameController.getDeck().dealCard());
         }

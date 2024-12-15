@@ -6,7 +6,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public void takeTurn(GameController gameController) {
+    public void takeTurn(BlackjackGameController gameController) {
         // Logic for human player's turn using GameController
     }
 }
