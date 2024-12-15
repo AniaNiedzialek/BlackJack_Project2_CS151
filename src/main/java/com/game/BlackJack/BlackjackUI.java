@@ -261,25 +261,32 @@ public class BlackjackUI extends Application {
     
 
     private void updateTable() {
+        // Clear the UI components
         playerBox.getChildren().clear();
-
         dealerBox.getChildren().clear();
         aiPlayer1Box.getChildren().clear();
         aiPlayer2Box.getChildren().clear();
-
+    
+        // Update the cards displayed for each player
         updateCardBox(playerBox, gameController.getHumanPlayer().getHand());
         updateCardBox(dealerBox, gameController.getDealer().getHand());
         updateCardBox(aiPlayer1Box, gameController.getAIPlayer1().getHand());
         updateCardBox(aiPlayer2Box, gameController.getAIPlayer2().getHand());
-
+    
+        // Update the bets for each player
         playerBetLabel.setText("Bet: " + gameController.getHumanPlayer().getBet());
         dealerBetLabel.setText("Bet: " + gameController.getDealer().getBet());
         aiPlayer1BetLabel.setText("Bet: " + gameController.getAIPlayer1().getBet());
         aiPlayer2BetLabel.setText("Bet: " + gameController.getAIPlayer2().getBet());
-
+    
+        // Retrieve the current player from the gameController
         Player currentPlayer = gameController.getCurrentPlayer();
+    
+        // Update the turn label to display the current player's name
         turnLabel.setText("Turn: " + currentPlayer.getName());
     }
+    
+    
 
     private void updateCardBox(HBox box, ArrayList<Card> hand) {
         for (Card card : hand) {
@@ -294,6 +301,7 @@ public class BlackjackUI extends Application {
             }
         }
     }
+    
 
     public static void main(String[] args) {
         launch(args);
