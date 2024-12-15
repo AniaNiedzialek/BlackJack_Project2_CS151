@@ -2,6 +2,9 @@ package com.game.BlackJack;
 
 import java.util.ArrayList;
 
+import com.game.ScoreTracker;
+import com.game.SessionManager;
+
 public class BlackjackGameController {
     private Deck deck;
     private ArrayList<Player> players;
@@ -118,6 +121,7 @@ public class BlackjackGameController {
             } else if (dealerBusted || playerValue > dealerValue) {
                 results.add(player.getName() + " wins!");
                 player.winBet();
+                ScoreTracker.writeScoreFile("blackjack", SessionManager.getInstance().getCurrentUser(), String.valueOf(player.getBalance()));
             } else if (playerValue == dealerValue) {
                 results.add(player.getName() + " ties with the dealer.");
                 player.tieBet();

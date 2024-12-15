@@ -8,3 +8,5 @@ snake default 1000
 snake default 1000
 snake default 1000
 snake default 1000
+blackjack 123 2000
+blackjack 123 1020
