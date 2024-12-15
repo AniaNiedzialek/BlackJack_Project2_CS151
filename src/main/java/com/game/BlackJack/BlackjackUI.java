@@ -59,98 +59,117 @@ public class BlackjackUI extends Application {
         -fx-text-fill: #1a1a1a;
         """;
 
-    @Override
-    public void start(Stage primaryStage) {
-        mainStage = primaryStage;
-        createWelcomeScene();
-        createGameScene();
-
-        mainStage.setScene(welcomeScene);
-        mainStage.setTitle("♠️ BlackJack Casino ♣️");
-        mainStage.show();
-    }
-
-    private void createWelcomeScene() {
-        VBox layout = new VBox(30);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(40));
-        layout.setBackground(new Background(new BackgroundFill(
-            Color.web("#1a1a1a"), CornerRadii.EMPTY, Insets.EMPTY)));
-
-        Label welcomeLabel = new Label("Welcome to\nBlackjack Casino");
-        welcomeLabel.setStyle("""
-            -fx-font-size: 48px;
-            -fx-font-family: 'Arial Black';
-            -fx-text-fill: #00ff00;
-            -fx-font-weight: bold;
-            -fx-text-alignment: center;
-            -fx-effect: dropshadow(gaussian, #00ff00, 3, 0.7, 0.0, 0.0);
-            """);
-        Button newGameButton = createStyledButton("New Game");
-        Button exitButton = createStyledButton("Exit");
-
-        newGameButton.setOnAction(e -> mainStage.setScene(gameScene));
-        exitButton.setOnAction(e -> mainStage.close());
-
-        layout.getChildren().addAll(welcomeLabel, newGameButton, exitButton);
-        welcomeScene = new Scene(layout, 1200, 800);
-    }
-
-    private void createGameScene() {
-        gameController = new BlackjackGameController();
-
-        tableLayout = new BorderPane();
-        tableLayout.setBackground(createTableBackground());
-        tableLayout.setPadding(new Insets(20));
-
-        turnLabel = createStyledLabel("Waiting...", 24);
-        decisionLabel = createStyledLabel("Decision: Waiting...", 20);
-        resultsLabel = createStyledLabel("", 18);
-
-        VBox centerBox = new VBox(15);
-        centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.getChildren().addAll(turnLabel, decisionLabel, resultsLabel);
-        centerBox.setPadding(new Insets(20));
-        tableLayout.setCenter(centerBox);
-
-        setupPlayerAreas();
-
-        hitButton = createStyledButton("Hit");
-        hitButton.setDisable(true); // Initially disabled
+        @Override
+        public void start(Stage primaryStage) {
+            mainStage = primaryStage;
+            createWelcomeScene();
+            createGameScene();
+    
+            mainStage.setScene(welcomeScene);
+            mainStage.setTitle("♠️ BlackJack Casino ♣️");
+            mainStage.show();
+        }
+    
+        private void createWelcomeScene() {
+            VBox layout = new VBox(30);
+            layout.setAlignment(Pos.CENTER);
+            layout.setPadding(new Insets(40));
+            layout.setBackground(new Background(new BackgroundFill(
+                Color.web("#1a1a1a"), CornerRadii.EMPTY, Insets.EMPTY)));
         
-        standButton = createStyledButton("Stand");
-        standButton.setDisable(true); // Initially disabled
+            Label welcomeLabel = new Label("Welcome to\nBlackjack Casino");
+            welcomeLabel.setStyle("""
+                -fx-font-size: 48px;
+                -fx-font-family: 'Arial Black';
+                -fx-text-fill: #00ff00;
+                -fx-font-weight: bold;
+                -fx-text-alignment: center;
+                -fx-effect: dropshadow(gaussian, #00ff00, 3, 0.7, 0.0, 0.0);
+                """);
+            Button newGameButton = createStyledButton("New Game");
+            Button exitButton = createStyledButton("Exit");
         
-        Button newGameButton = createStyledButton("Start New Game!");
-
-        saveButton = createStyledButton("Save Game!");
-        loadGame = createStyledButton("Load Game!");
-
-        hitButton.setOnAction(e -> hit());
-        standButton.setOnAction(e -> stand());
-        newGameButton.setOnAction(e -> startNewGame());
-        saveButton.setOnAction(e->savegame());
-        loadGame.setOnAction(e->loadGame());
-
-        HBox buttonBox = new HBox(20, newGameButton, hitButton, standButton, saveButton, loadGame);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(20));
-
-        VBox bottomBox = new VBox(20, playerBox, buttonBox);
-        bottomBox.setAlignment(Pos.CENTER);
-        tableLayout.setBottom(bottomBox);
-
-        gameScene = new Scene(tableLayout, 1200, 800);
-    }
-
-    private Background createTableBackground() {
-        return new Background(new BackgroundFill(
-            Color.web("#0d4d0d"), 
-            new CornerRadii(15), 
-            Insets.EMPTY
-        ));
-    }
-
+            newGameButton.setOnAction(e -> mainStage.setScene(gameScene));
+            exitButton.setOnAction(e -> mainStage.close());
+        
+            layout.getChildren().addAll(welcomeLabel, newGameButton, exitButton);
+        
+            BorderPane welcomeLayout = new BorderPane();
+            welcomeLayout.setTop(createToolbar()); // Add the toolbar
+            welcomeLayout.setCenter(layout);
+        
+            welcomeScene = new Scene(welcomeLayout, 1200, 800);
+        }
+        
+        private void createGameScene() {
+            gameController = new BlackjackGameController();
+        
+            // Create the main layout for the game
+            tableLayout = new BorderPane();
+            tableLayout.setBackground(new Background(new BackgroundFill(
+                Color.web("#0d4d0d"), CornerRadii.EMPTY, Insets.EMPTY
+            )));
+            tableLayout.setPadding(new Insets(20));
+        
+            // Add the toolbar at the top
+            ToolBarUI toolbar = createToolbar(); // Reuse the toolbar creation method
+            toolbar.setStyle("-fx-background-color: rgba(0, 51, 0, 0.8); -fx-border-color: #00ff00; -fx-border-width: 2px;");
+        
+            BorderPane gameLayout = new BorderPane();
+            gameLayout.setTop(toolbar); // Add toolbar to the top of the game layout
+            gameLayout.setCenter(tableLayout); // Set tableLayout as the center content
+        
+            turnLabel = createStyledLabel("Waiting...", 24);
+            decisionLabel = createStyledLabel("Decision: Waiting...", 20);
+            resultsLabel = createStyledLabel("", 18);
+        
+            VBox centerBox = new VBox(15);
+            centerBox.setAlignment(Pos.TOP_CENTER);
+            centerBox.getChildren().addAll(turnLabel, decisionLabel, resultsLabel);
+            centerBox.setPadding(new Insets(20));
+            tableLayout.setCenter(centerBox);
+        
+            setupPlayerAreas();
+        
+            hitButton = createStyledButton("Hit");
+            hitButton.setDisable(true); // Initially disabled
+        
+            standButton = createStyledButton("Stand");
+            standButton.setDisable(true); // Initially disabled
+        
+            Button newGameButton = createStyledButton("Start New Game!");
+            saveButton = createStyledButton("Save Game!");
+            loadGame = createStyledButton("Load Game!");
+        
+            hitButton.setOnAction(e -> hit());
+            standButton.setOnAction(e -> stand());
+            newGameButton.setOnAction(e -> startNewGame());
+            saveButton.setOnAction(e -> savegame());
+            loadGame.setOnAction(e -> loadGame());
+        
+            HBox buttonBox = new HBox(20, newGameButton, hitButton, standButton, saveButton, loadGame);
+            buttonBox.setAlignment(Pos.CENTER);
+            buttonBox.setPadding(new Insets(20));
+        
+            VBox bottomBox = new VBox(20, playerBox, buttonBox);
+            bottomBox.setAlignment(Pos.CENTER);
+            tableLayout.setBottom(bottomBox);
+        
+            gameScene = new Scene(gameLayout, 1200, 800);
+        }
+        
+        private ToolBarUI createToolbar() {
+            ToolBarUI toolbar = new ToolBarUI();
+            toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
+            toolbar.getMenuButton().setOnAction(e -> {
+                mainStage.close();
+                GameManagerUI gameManager = new GameManagerUI();
+                gameManager.showMainApp(mainStage);
+            });
+            return toolbar;
+        }
+        
+                
     private void savegame() {
         String saveStateString = gameController.generateSaveStateString(); // Generate save string
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -191,87 +210,37 @@ public class BlackjackUI extends Application {
     
 
     private void setupPlayerAreas() {
-        // Initialize value labels
         playerValueLabel = createStyledLabel("Value: 0", 16);
         aiPlayer1ValueLabel = createStyledLabel("Value: 0", 16);
         aiPlayer2ValueLabel = createStyledLabel("Value: 0", 16);
         dealerValueLabel = createStyledLabel("Value: 0", 16);
-    
-        // Create card areas
+
         dealerBox = createPlayerArea("Dealer");
         aiPlayer1Box = createPlayerArea("AI Player 1");
         aiPlayer2Box = createPlayerArea("AI Player 2");
         playerBox = createPlayerArea("You");
-    
-        // Add the ToolBarUI and style it
-        ToolBarUI toolbar = new ToolBarUI();
-        toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
 
-        // Set up main menu button action
-        toolbar.getMenuButton().setOnAction(e -> {
-            mainStage.close();
-            GameManagerUI gameManager = new GameManagerUI();
-            gameManager.showMainApp(mainStage);
-        });
-
-        // Create and set up player areas with proper constraints
-        VBox dealerArea = new VBox(5);  // Reduced spacing
+        VBox dealerArea = new VBox(5);
         dealerArea.setAlignment(Pos.CENTER);
-        dealerArea.getChildren().addAll(
-            createStyledLabel("♠️ Dealer ♣️", 20),
-            dealerBox,
-            dealerValueLabel
-        );
+        dealerArea.getChildren().addAll(createStyledLabel("♠️ Dealer ♣️", 20), dealerBox, dealerValueLabel);
 
-        // Combine toolbar and dealerArea into a VBox
-        VBox topBox = new VBox();
-        topBox.setSpacing(10); // Add spacing between toolbar and dealer area
-        topBox.getChildren().addAll(toolbar, dealerArea);
-    
-        VBox aiPlayer1Area = new VBox(5);  // Reduced spacing
+        VBox aiPlayer1Area = new VBox(5);
         aiPlayer1Area.setAlignment(Pos.CENTER);
-        aiPlayer1Area.getChildren().addAll(
-            createStyledLabel("♥️ Player 1 ♦️", 20),
-            aiPlayer1Box,
-            aiPlayer1ValueLabel
-        );
-    
-        VBox aiPlayer2Area = new VBox(5);  // Reduced spacing
+        aiPlayer1Area.getChildren().addAll(createStyledLabel("♥️ Player 1 ♦️", 20), aiPlayer1Box, aiPlayer1ValueLabel);
+
+        VBox aiPlayer2Area = new VBox(5);
         aiPlayer2Area.setAlignment(Pos.CENTER);
-        aiPlayer2Area.getChildren().addAll(
-            createStyledLabel("♦️ Player 2 ♥️", 20),
-            aiPlayer2Box,
-            aiPlayer2ValueLabel
-        );
-    
-        // Create player area
-        VBox playerArea = new VBox(5);  // Reduced spacing
+        aiPlayer2Area.getChildren().addAll(createStyledLabel("♦️ Player 2 ♥️", 20), aiPlayer2Box, aiPlayer2ValueLabel);
+
+        VBox playerArea = new VBox(5);
         playerArea.setAlignment(Pos.CENTER);
-        playerArea.getChildren().addAll(
-            createStyledLabel("♥️ You ♠️", 20),
-            playerBox,
-            playerValueLabel
-        );
-    
-        // Set maximum heights for areas to prevent pushing
-        dealerArea.setMaxHeight(300);
-        aiPlayer1Area.setMaxHeight(300);
-        aiPlayer2Area.setMaxHeight(300);
-        playerArea.setMaxHeight(300);
-    
-        // Add areas to layout with proper constraints
-        tableLayout.setTop(topBox);
+        playerArea.getChildren().addAll(createStyledLabel("♥️ You ♠️", 20), playerBox, playerValueLabel);
+
+        tableLayout.setTop(dealerArea);
         tableLayout.setLeft(aiPlayer1Area);
         tableLayout.setRight(aiPlayer2Area);
         tableLayout.setBottom(playerArea);
-        
-        // Set smaller margins
-        BorderPane.setMargin(dealerArea, new Insets(10));
-        BorderPane.setMargin(aiPlayer1Area, new Insets(10));
-        BorderPane.setMargin(aiPlayer2Area, new Insets(10));
-        BorderPane.setMargin(playerArea, new Insets(10));
     }
-
     private HBox createPlayerArea(String name) {
         HBox box = new HBox(0);  // Set spacing to 0 since we'll handle card spacing manually
         box.setAlignment(Pos.CENTER);
@@ -601,8 +570,8 @@ public class BlackjackUI extends Application {
     private void displayFinalResults() {
         ArrayList<String> results = gameController.resolveRound();
     
-        VBox resultsBox = new VBox(20); // Added spacing between elements
-        resultsBox.setAlignment(Pos.CENTER); // Center everything in the VBox
+        VBox resultsBox = new VBox(20);
+        resultsBox.setAlignment(Pos.CENTER);
         resultsBox.setStyle("""
             -fx-background-color: linear-gradient(to bottom, #000000, #0d4d0d);
             -fx-padding: 30;
@@ -610,45 +579,39 @@ public class BlackjackUI extends Application {
             -fx-border-color: #00ff00;
             -fx-border-width: 3;
             -fx-border-radius: 20;
-            -fx-effect: dropshadow(gaussian, rgba(0,255,0,0.5), 15, 0.5, 0.0, 0.0);
             """);
     
-        // Round Over Label
         Label roundOverLabel = new Label("🎉 Round Over! 🎉");
         roundOverLabel.setStyle("""
             -fx-font-size: 20px;
             -fx-text-fill: #00ff00;
             -fx-font-weight: bold;
-            -fx-font-family: 'Arial Black';
             """);
     
-        // Centering each result text
-        VBox resultsList = new VBox(10); // Add spacing between results
-        resultsList.setAlignment(Pos.CENTER); // Center the result labels
+        VBox resultsList = new VBox(10);
+        resultsList.setAlignment(Pos.CENTER);
     
         for (String result : results) {
             Label resultLabel = new Label(result);
             resultLabel.setStyle("""
-                -fx-font-size: 20px;
+                -fx-font-size: 16px;
                 -fx-text-fill: white;
-                -fx-text-alignment: center;
                 """);
             resultsList.getChildren().add(resultLabel);
         }
     
         resultsBox.getChildren().addAll(roundOverLabel, resultsList);
     
-        // Center the results box on the table layout
-        VBox centerBox = (VBox) tableLayout.getCenter();
-        centerBox.getChildren().clear();
-        centerBox.setAlignment(Pos.CENTER); // Center the entire results box
-        centerBox.getChildren().add(resultsBox);
+        VBox centerBox = new VBox(15);
+        centerBox.setAlignment(Pos.TOP_CENTER);
+        centerBox.getChildren().addAll(turnLabel, resultsBox);
+        tableLayout.setCenter(centerBox); // Only modify the center section
     
         turnLabel.setText("Round Over!");
         hitButton.setDisable(true);
         standButton.setDisable(true);
     }
-    
+        
     private void updateTable() {
         clearAllPlayerAreas();
         boolean isRoundOver = gameController.isRoundOver();
