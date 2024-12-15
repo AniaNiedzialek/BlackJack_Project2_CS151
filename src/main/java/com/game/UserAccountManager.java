@@ -20,7 +20,7 @@ public class UserAccountManager {
     public static void writeAccountFile(String username, String password) {
         // Create writer
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(username + " " + password + "\n");
+            writer.write(username + " " + Encryption.encrypt(password) + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,8 +40,8 @@ public class UserAccountManager {
                 if (loginInfo.length == 2) {
                     // Put username and password into hashmap
                     String username = loginInfo[0].trim();
-                    String password = loginInfo[1].trim();
-                    fileAccounts.put(username, password);
+                    String encryptedPassword = loginInfo[1].trim();
+                    fileAccounts.put(username, encryptedPassword);
                 }
             }
         } catch (IOException e) {
@@ -56,8 +56,15 @@ public class UserAccountManager {
         HashMap<String, String> userAccounts = readAccountFile();
         // Check if username is in hashmap
         if(userAccounts.containsKey(username)){
+
+            // Retrieve encrypted password
+            String encryptedPasswords = userAccounts.get(username);
+
+            // Decrypt password
+            String decryptedPassword = Encryption.decrypt(encryptedPasswords);
+
             // Check if password matches with password in hashmap
-            return password.equals(userAccounts.get(username));
+            return password.equals(decryptedPassword);
         }
         // Returns false if username is not in hashmap
         return false;
