@@ -1,7 +1,6 @@
 package com.game.BlackJack;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class BlackjackGameController {
     private Deck deck;
@@ -28,16 +27,13 @@ public class BlackjackGameController {
     }
 
     public void initializeBets() {
-        Random random = new Random();
         for (Player player : players) {
             if (player instanceof AIPlayer) {
-                int bet = 50 + random.nextInt(101); // Generates a random number between 50 and 150
-                ((AIPlayer) player).setBet(bet); // Directly set the bet without deducting balance
-                System.out.println(player.getName() + " places a bet of $" + bet);
+                // AI players place a default bet
+                ((AIPlayer) player).placeBet(10); // Example: AI always bets $10
             }
         }
     }
-    
     
 
     /**
@@ -198,4 +194,79 @@ public class BlackjackGameController {
     public ArrayList<Player> getPlayers() {
         return players;
     }
+
+    public void loadSaveStateString(String saveStateString) {
+        String[] sections = saveStateString.split("\\|");
+        players.clear();
+    
+        for (String section : sections) {
+            if (section.startsWith("Dealer:")) {
+                // Load dealer's cards
+                dealer.clearHand();
+                String[] cards = section.substring(7).split(",");
+                for (String card : cards) {
+                    if (!card.isEmpty()) {
+                        String[] rankAndSuit = card.split("-");
+                        dealer.addCard(new Card(rankAndSuit[0], rankAndSuit[1]));
+                    }
+                }
+            } else if (section.startsWith("Turn:")) {
+                // Load turn information
+                currentPlayerIndex = Integer.parseInt(section.substring(5));
+            } else {
+                // Load player's information
+                String[] parts = section.split(":");
+                String name = parts[0];
+                int balance = Integer.parseInt(parts[1]);
+                int bet = Integer.parseInt(parts[2]);
+                String[] cards = parts[3].split(",");
+    
+                Player player;
+                if (name.equals("Human")) {
+                    player = new HumanPlayer(name, balance);
+                } else {
+                    player = new AIPlayer(name, balance);
+                }
+                player.placeBet(bet);
+                for (String card : cards) {
+                    String[] rankAndSuit = card.split("-");
+                    player.addCard(new Card(rankAndSuit[0], rankAndSuit[1]));
+                }
+                players.add(player);
+            }
+        }
+    }
+
+    public String generateSaveStateString() {
+        StringBuilder saveState = new StringBuilder();
+    
+        // Encode players' information
+        for (Player player : players) {
+            saveState.append(player.getName()).append(":");
+            saveState.append(player.getBalance()).append(":");
+            saveState.append(player.getBet()).append(":");
+            for (Card card : player.getHand()) {
+                saveState.append(card.getRank()).append("-").append(card.getSuit()).append(",");
+            }
+            saveState.deleteCharAt(saveState.length() - 1); // Remove trailing comma
+            saveState.append("|");
+        }
+    
+        // Encode dealer's information
+        saveState.append("Dealer:");
+        for (Card card : dealer.getHand()) {
+            saveState.append(card.getRank()).append("-").append(card.getSuit()).append(",");
+        }
+        if (!dealer.getHand().isEmpty()) {
+            saveState.deleteCharAt(saveState.length() - 1); // Remove trailing comma
+        }
+        saveState.append("|");
+    
+        // Add turn information
+        saveState.append("Turn:").append(currentPlayerIndex);
+    
+        return saveState.toString();
+    }
+    
+    
 }

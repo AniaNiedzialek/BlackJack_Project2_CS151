@@ -4,10 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Random;
-
-import com.game.GameManagerUI;
-import com.game.ToolBarUI;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -31,7 +27,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.layout.VBox;
 
 public class BlackjackUI extends Application {
     private BlackjackGameController gameController;
@@ -40,7 +35,8 @@ public class BlackjackUI extends Application {
     private Scene gameScene, welcomeScene;
     private Stage mainStage;
     private BorderPane tableLayout;
-    private Button hitButton, standButton;
+    private Button hitButton, standButton, saveButton, loadGame; 
+    
     private Label playerValueLabel, aiPlayer1ValueLabel, aiPlayer2ValueLabel, dealerValueLabel;
 
     private static final String BUTTON_STYLE = """
@@ -99,46 +95,51 @@ public class BlackjackUI extends Application {
 
     private void createGameScene() {
         gameController = new BlackjackGameController();
-    
+
         tableLayout = new BorderPane();
         tableLayout.setBackground(createTableBackground());
         tableLayout.setPadding(new Insets(20));
-    
+
         turnLabel = createStyledLabel("Waiting...", 24);
         decisionLabel = createStyledLabel("Decision: Waiting...", 20);
         resultsLabel = createStyledLabel("", 18);
-    
+
         VBox centerBox = new VBox(15);
         centerBox.setAlignment(Pos.TOP_CENTER);
         centerBox.getChildren().addAll(turnLabel, decisionLabel, resultsLabel);
         centerBox.setPadding(new Insets(20));
         tableLayout.setCenter(centerBox);
-    
+
         setupPlayerAreas();
-    
+
         hitButton = createStyledButton("Hit");
-        hitButton.setDisable(true);
-    
+        hitButton.setDisable(true); // Initially disabled
+        
         standButton = createStyledButton("Stand");
-        standButton.setDisable(true);
-    
+        standButton.setDisable(true); // Initially disabled
+        
         Button newGameButton = createStyledButton("Start New Game!");
-    
+
+        saveButton = createStyledButton("Save Game!");
+        loadGame = createStyledButton("Load Game!");
+
         hitButton.setOnAction(e -> hit());
         standButton.setOnAction(e -> stand());
         newGameButton.setOnAction(e -> startNewGame());
-    
-        HBox buttonBox = new HBox(20, newGameButton, hitButton, standButton);
+        saveButton.setOnAction(e->savegame());
+        loadGame.setOnAction(e->loadGame());
+
+        HBox buttonBox = new HBox(20, newGameButton, hitButton, standButton, saveButton, loadGame);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(20));
-    
+
         VBox bottomBox = new VBox(20, playerBox, buttonBox);
         bottomBox.setAlignment(Pos.CENTER);
         tableLayout.setBottom(bottomBox);
-    
+
         gameScene = new Scene(tableLayout, 1200, 800);
     }
-        
+
     private Background createTableBackground() {
         return new Background(new BackgroundFill(
             Color.web("#0d4d0d"), 
@@ -146,6 +147,45 @@ public class BlackjackUI extends Application {
             Insets.EMPTY
         ));
     }
+
+    private void savegame() {
+        String saveStateString = gameController.generateSaveStateString(); // Generate save string
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Saved");
+        alert.setHeaderText("Copy and save this string to load the game later:");
+        alert.setContentText(saveStateString);
+    
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #1a1a1a;");
+        dialogPane.lookupAll(".label").forEach(label -> label.setStyle("-fx-text-fill: #00ff00;"));
+        dialogPane.lookupAll(".button").forEach(button -> button.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: #00ff00;"));
+    
+        alert.showAndWait();
+    }
+    
+    private void loadGame() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Load Game");
+        dialog.setHeaderText("Paste your saved game string:");
+        dialog.setContentText("Save State String:");
+    
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(saveStateString -> {
+            try {
+                gameController.loadSaveStateString(saveStateString); // Load saved state
+                updateTable(); // Refresh the table UI
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Game Loaded");
+                successAlert.setHeaderText("Success!");
+                successAlert.setContentText("Game state loaded successfully.");
+                successAlert.showAndWait();
+            } catch (Exception e) {
+                showError("Invalid save state string. Please try again.");
+            }
+        });
+    }
+    
+    
 
     private void setupPlayerAreas() {
         // Initialize value labels
@@ -168,22 +208,6 @@ public class BlackjackUI extends Application {
             dealerBox,
             dealerValueLabel
         );
-
-        // Add the ToolBarUI and style it
-        ToolBarUI toolbar = new ToolBarUI();
-        toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
-
-        // Set up main menu button action
-        toolbar.getMenuButton().setOnAction(e -> {
-            mainStage.close();
-            GameManagerUI gameManager = new GameManagerUI();
-            gameManager.showMainApp(mainStage);
-        });
-
-        // Combine toolbar and dealerArea into a VBox
-        VBox topBox = new VBox();
-        topBox.setSpacing(10); // Add spacing between toolbar and dealer area
-        topBox.getChildren().addAll(toolbar, dealerArea);        
     
         VBox aiPlayer1Area = new VBox(5);  // Reduced spacing
         aiPlayer1Area.setAlignment(Pos.CENTER);
@@ -215,9 +239,9 @@ public class BlackjackUI extends Application {
         aiPlayer1Area.setMaxHeight(300);
         aiPlayer2Area.setMaxHeight(300);
         playerArea.setMaxHeight(300);
-
+    
         // Add areas to layout with proper constraints
-        tableLayout.setTop(topBox);
+        tableLayout.setTop(dealerArea);
         tableLayout.setLeft(aiPlayer1Area);
         tableLayout.setRight(aiPlayer2Area);
         tableLayout.setBottom(playerArea);
@@ -280,17 +304,14 @@ public class BlackjackUI extends Application {
             -fx-border-width: 2px;
             """);
     
-
-    // Style the header text only
-    Label headerLabel = (Label) dialogPane.lookup(".header-panel .label");
-    if (headerLabel != null) {
-        headerLabel.setStyle("""
-            -fx-text-fill: #00ff00; /* Green text */
-            -fx-font-size: 16px;
-            -fx-font-weight: bold;
-            """);
-    }
-
+        // Style the header text
+        dialogPane.lookupAll(".header-panel").forEach(header -> 
+            header.setStyle("""
+                -fx-background-color: #1a1a1a;
+                -fx-text-fill: #00ff00;
+                -fx-font-size: 16px;
+                -fx-font-weight: bold;
+                """));
     
         // Style all labels
         dialogPane.lookupAll(".label").forEach(label -> 
@@ -386,37 +407,34 @@ public class BlackjackUI extends Application {
 
     private void startNewGame() {
         gameController.startRound();
-
+        
         // Get human player's bet
         HumanPlayer humanPlayer = gameController.getHumanPlayer();
         int bet = promptForBet(humanPlayer.getName(), humanPlayer.getBalance());
         humanPlayer.placeBet(bet);
-
-        // Set random bets for AI players
-        Random random = new Random();
+        
+        // Set AI bets (you can adjust these amounts)
         AIPlayer ai1 = gameController.getAIPlayer1();
         AIPlayer ai2 = gameController.getAIPlayer2();
-
-        int ai1Bet = 50 + random.nextInt(101); // Random bet between 50 and 150
-        int ai2Bet = 50 + random.nextInt(101); // Random bet between 50 and 150
-
-        ai1.setBet(ai1Bet); // Use the new setBet method
-        ai2.setBet(ai2Bet); // Use the new setBet method
-
-        System.out.println(ai1.getName() + " places a bet of $" + ai1Bet);
-        System.out.println(ai2.getName() + " places a bet of $" + ai2Bet);
-
+        try {
+            ai1.placeBet(Math.min(10, ai1.getBalance()));
+            ai2.placeBet(Math.min(10, ai2.getBalance()));
+        } catch (IllegalArgumentException e) {
+            showError("Game cannot continue: AI players have insufficient funds");
+            return;
+        }
+    
         hitButton.setDisable(false);
         standButton.setDisable(false);
         resultsLabel.setText("");
-
+        
         VBox centerBox = (VBox) tableLayout.getCenter();
         centerBox.getChildren().clear();
         centerBox.getChildren().addAll(turnLabel, decisionLabel, resultsLabel);
-
+        
         updateTable();
         turnLabel.setText("Your Turn");
-    }
+    }   
 
     private void hit() {
         Player player = gameController.getCurrentPlayer();
@@ -633,20 +651,21 @@ public class BlackjackUI extends Application {
             false,
             isRoundOver
         ));
-        aiPlayer1ValueLabel.setText(String.format("Bet: $%d | %s",
+        aiPlayer1ValueLabel.setText(String.format("%s | Bet: $%d | Balance: $%d",
+            isRoundOver ? "Value: " + gameController.getAIPlayer1().calculateHandValue() : "Value: ?",
             gameController.getAIPlayer1().getBet(),
-            isRoundOver ? "Value: " + gameController.getAIPlayer1().calculateHandValue() : "Value: ?"));
-
+            gameController.getAIPlayer1().getBalance()));
+    
         // AI Player 2
         aiPlayer2Box.getChildren().addAll(createPlayerCardImages(
             gameController.getAIPlayer2().getHand(),
             false,
             isRoundOver
         ));
-        aiPlayer2ValueLabel.setText(String.format("Bet: $%d | %s",
+        aiPlayer2ValueLabel.setText(String.format("%s | Bet: $%d | Balance: $%d",
+            isRoundOver ? "Value: " + gameController.getAIPlayer2().calculateHandValue() : "Value: ?",
             gameController.getAIPlayer2().getBet(),
-            isRoundOver ? "Value: " + gameController.getAIPlayer2().calculateHandValue() : "Value: ?"));
-
+            gameController.getAIPlayer2().getBalance()));
     
         // Dealer's cards
         ArrayList<Card> dealerCards = gameController.getDealer().getHand();
@@ -721,7 +740,6 @@ public class BlackjackUI extends Application {
             return fallbackView;
         }
     }
-
 
     public static void main(String[] args) {
         launch(args);
