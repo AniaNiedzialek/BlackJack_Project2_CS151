@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import com.game.GameManagerUI;
+import com.game.ToolBarUI;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -200,6 +203,17 @@ public class BlackjackUI extends Application {
         aiPlayer2Box = createPlayerArea("AI Player 2");
         playerBox = createPlayerArea("You");
     
+        // Add the ToolBarUI and style it
+        ToolBarUI toolbar = new ToolBarUI();
+        toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
+
+        // Set up main menu button action
+        toolbar.getMenuButton().setOnAction(e -> {
+            mainStage.close();
+            GameManagerUI gameManager = new GameManagerUI();
+            gameManager.showMainApp(mainStage);
+        });
+
         // Create and set up player areas with proper constraints
         VBox dealerArea = new VBox(5);  // Reduced spacing
         dealerArea.setAlignment(Pos.CENTER);
@@ -208,6 +222,11 @@ public class BlackjackUI extends Application {
             dealerBox,
             dealerValueLabel
         );
+
+        // Combine toolbar and dealerArea into a VBox
+        VBox topBox = new VBox();
+        topBox.setSpacing(10); // Add spacing between toolbar and dealer area
+        topBox.getChildren().addAll(toolbar, dealerArea);
     
         VBox aiPlayer1Area = new VBox(5);  // Reduced spacing
         aiPlayer1Area.setAlignment(Pos.CENTER);
@@ -241,7 +260,7 @@ public class BlackjackUI extends Application {
         playerArea.setMaxHeight(300);
     
         // Add areas to layout with proper constraints
-        tableLayout.setTop(dealerArea);
+        tableLayout.setTop(topBox);
         tableLayout.setLeft(aiPlayer1Area);
         tableLayout.setRight(aiPlayer2Area);
         tableLayout.setBottom(playerArea);
