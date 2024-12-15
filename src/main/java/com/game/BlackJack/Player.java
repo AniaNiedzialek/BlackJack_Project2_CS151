@@ -17,13 +17,18 @@ public abstract class Player {
 
     // Methods for betting
     public void placeBet(int betAmount) {
-        if (betAmount <= balance) {
-            this.bet = betAmount;
-            this.balance -= betAmount;
+        if (this instanceof AIPlayer) {
+            this.bet = betAmount; // Directly set the bet for AI players without balance checks
         } else {
-            throw new IllegalArgumentException(name + " has insufficient balance to place this bet!");
+            if (betAmount <= balance) {
+                this.bet = betAmount;
+                this.balance -= betAmount;
+            } else {
+                throw new IllegalArgumentException(name + " has insufficient balance to place this bet!");
+            }
         }
     }
+    
 
     public void winBet() {
         this.balance += this.bet * 2; // Winner gets 2x their bet

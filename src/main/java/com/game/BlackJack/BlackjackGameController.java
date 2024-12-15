@@ -1,6 +1,7 @@
 package com.game.BlackJack;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class BlackjackGameController {
     private Deck deck;
@@ -27,13 +28,16 @@ public class BlackjackGameController {
     }
 
     public void initializeBets() {
+        Random random = new Random();
         for (Player player : players) {
             if (player instanceof AIPlayer) {
-                // AI players place a default bet
-                ((AIPlayer) player).placeBet(10); // Example: AI always bets $10
+                int bet = 50 + random.nextInt(101); // Generates a random number between 50 and 150
+                ((AIPlayer) player).setBet(bet); // Directly set the bet without deducting balance
+                System.out.println(player.getName() + " places a bet of $" + bet);
             }
         }
     }
+    
     
 
     /**
