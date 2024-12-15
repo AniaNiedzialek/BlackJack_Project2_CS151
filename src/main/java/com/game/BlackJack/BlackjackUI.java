@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 
+import com.game.GameManagerUI;
 import com.game.ToolBarUI;
 
 import javafx.animation.PauseTransition;
@@ -30,6 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.layout.VBox;
 
 public class BlackjackUI extends Application {
     private BlackjackGameController gameController;
@@ -102,11 +104,6 @@ public class BlackjackUI extends Application {
         tableLayout.setBackground(createTableBackground());
         tableLayout.setPadding(new Insets(20));
     
-        // Add the ToolBarUI and style it
-        ToolBarUI toolbar = new ToolBarUI();
-        toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
-        tableLayout.setTop(toolbar); // Add toolbar to the top of the BorderPane
-    
         turnLabel = createStyledLabel("Waiting...", 24);
         decisionLabel = createStyledLabel("Decision: Waiting...", 20);
         resultsLabel = createStyledLabel("", 18);
@@ -171,6 +168,22 @@ public class BlackjackUI extends Application {
             dealerBox,
             dealerValueLabel
         );
+
+        // Add the ToolBarUI and style it
+        ToolBarUI toolbar = new ToolBarUI();
+        toolbar.setStyle("-fx-background-color: #003300; -fx-border-color: #00ff00; -fx-border-width: 2px;");
+
+        // Set up main menu button action
+        toolbar.getMenuButton().setOnAction(e -> {
+            mainStage.close();
+            GameManagerUI gameManager = new GameManagerUI();
+            gameManager.showMainApp(mainStage);
+        });
+
+        // Combine toolbar and dealerArea into a VBox
+        VBox topBox = new VBox();
+        topBox.setSpacing(10); // Add spacing between toolbar and dealer area
+        topBox.getChildren().addAll(toolbar, dealerArea);        
     
         VBox aiPlayer1Area = new VBox(5);  // Reduced spacing
         aiPlayer1Area.setAlignment(Pos.CENTER);
@@ -202,9 +215,9 @@ public class BlackjackUI extends Application {
         aiPlayer1Area.setMaxHeight(300);
         aiPlayer2Area.setMaxHeight(300);
         playerArea.setMaxHeight(300);
-    
+
         // Add areas to layout with proper constraints
-        tableLayout.setTop(dealerArea);
+        tableLayout.setTop(topBox);
         tableLayout.setLeft(aiPlayer1Area);
         tableLayout.setRight(aiPlayer2Area);
         tableLayout.setBottom(playerArea);

@@ -81,7 +81,6 @@ public class SnakeGameBoardTest extends Application {
             primaryStage.close();
             GameManagerUI gameManager = new GameManagerUI();
             gameManager.showMainApp(primaryStage);
-
         });
 
         // Add toolbar and game board to container
