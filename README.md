@@ -60,6 +60,8 @@ players win.
 ---
 ### Snake
 The game allows to grow the snake until the game ends. 
+![UML Diagram](resources/SnakeUML.png)
+
 
 #### **Features**:
 - **Playable Snake**
