@@ -26,18 +26,20 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 
 public class GameManagerUI extends Application {
 
+    String currentUsername = SessionManager.getInstance().getCurrentUser();
+
     @Override
     public void start(Stage primaryStage) {
         showLoginScreen(primaryStage);
     }
-
-    String currentUsername = "";
 
     private void showLoginScreen(Stage stage) {
         // Login form layout
@@ -187,7 +189,7 @@ public class GameManagerUI extends Application {
     Button blackjackButton = new Button("Play BlackJack");
     blackjackButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
     blackjackButton.setOnAction(e -> {
-        startBlackJackGame();
+        startBlackJackGame(stage);
         // Start Black Jack Game
     }
     );
@@ -195,7 +197,7 @@ public class GameManagerUI extends Application {
     Button snakeButton = new Button("Play Snake");
     snakeButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white;");
     snakeButton.setOnAction(e -> {
-        startSnakeGame();
+        startSnakeGame(stage);
         // Start Snake Game
     });
 
@@ -297,39 +299,47 @@ public class GameManagerUI extends Application {
         alert.showAndWait();
     }
 
-    private void startBlackJackGame() {
+    private void startBlackJackGame(Stage currentStage) {
         SessionManager.getInstance().setCurrentUser(currentUsername);
         BlackjackUI blackjackUI = new BlackjackUI();
+        currentStage.close();
         blackjackUI.start(new Stage());
     }
 
-    private void startSnakeGame() {
+    private void startSnakeGame(Stage currentStage) {
         SessionManager.getInstance().setCurrentUser(currentUsername);
         SnakeGameBoardTest snakeGameBoardTest = new SnakeGameBoardTest();
+        currentStage.close();
         snakeGameBoardTest.start(new Stage());
     }
 
     private void fillHighScore(ListView<String> scoresList, String gameName) {
-        List<String[]> fileScores = new ScoreTracker().readScoreFile();
-        List<String[]> gameScores = new ArrayList<>();
-        for (String[] score : fileScores) {
-            if(score[0].equalsIgnoreCase(gameName)) {
-                gameScores.add(score);
-            }
-        }
+    List<String[]> fileScores = new ScoreTracker().readScoreFile();
+    Map<String, Integer> highestScores = new HashMap<>();
 
-        gameScores.sort((a, b) -> Integer.compare(Integer.parseInt(b[2]), Integer.parseInt(a[2])));
-
-        ObservableList<String> playerScores = FXCollections.observableArrayList();
-        
-        for (int i = 0; i < 5; i++) {
-            String[] score = gameScores.get(i);
-            String scoreEntry = (i + 1) + ". " + score[1] + " | Score: " + score[2];
-            playerScores.add(scoreEntry);
+    // Filter and keep only the highest score for each username
+    for (String[] score : fileScores) {
+        if (score[0].equalsIgnoreCase(gameName)) {
+            String username = score[1];
+            int scoreValue = Integer.parseInt(score[2]);
+            highestScores.put(username, Math.max(highestScores.getOrDefault(username, 0), scoreValue));
         }
-        
-        scoresList.setItems(playerScores);
     }
+
+    // Convert the map to a list of entries and sort by score in descending order
+    List<Map.Entry<String, Integer>> sortedScores = new ArrayList<>(highestScores.entrySet());
+    sortedScores.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+    // Prepare the top 5 scores for display
+    ObservableList<String> playerScores = FXCollections.observableArrayList();
+    for (int i = 0; i < Math.min(sortedScores.size(), 5); i++) {
+        Map.Entry<String, Integer> entry = sortedScores.get(i);
+        String scoreEntry = (i + 1) + ". " + entry.getKey() + " | Score: " + entry.getValue();
+        playerScores.add(scoreEntry);
+    }
+
+    scoresList.setItems(playerScores);
+    }       
 
     public static void main(String[] args) {
         launch(args);

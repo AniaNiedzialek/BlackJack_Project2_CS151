@@ -1,6 +1,8 @@
 package com.game.Snake;
 
 import com.game.DirectionType;
+import com.game.GameManagerUI;
+import com.game.SessionManager;
 import com.game.ToolBarUI;
 
 import javafx.animation.KeyFrame;
@@ -77,6 +79,9 @@ public class SnakeGameBoardTest extends Application {
         toolBarUI.getMenuButton().setOnAction(e -> {
             gameBoard.getSnakeController().stopGame();
             primaryStage.close();
+            GameManagerUI gameManager = new GameManagerUI();
+            gameManager.showMainApp(primaryStage);
+
         });
 
         // Add toolbar and game board to container
